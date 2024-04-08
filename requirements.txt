@@ -1,0 +1,11 @@
+Django
+django-model-utils
+mysqlclient
+gunicorn
+jinja2
+pytz
+python-dateutil
+django-jinja
+django-bootstrap-v5
+django-environ
+user_agents
