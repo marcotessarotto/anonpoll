@@ -1,0 +1,187 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>{% block title %}Base template{% endblock %}</title>
+
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="/static/assets/img/favicon.png" rel="icon">
+    <!--<link href="/static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">-->
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <!-- teniamo le risorse di jquery tutte assieme-->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+<!--    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.1/b-2.3.3/b-html5-2.3.3/rr-1.3.1/sp-2.1.0/datatables.min.css"/>-->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
+
+<!--    <link href="/static/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">-->
+
+    <!-- Template Main CSS File - light theme -->
+    <!--  <link rel="stylesheet" href="/static/assets/vendor/bootstrap-table/bootstrap-table.min.css">-->
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.css">
+
+    <link href="/static/assets/css/style.css" rel="stylesheet">
+
+    <style>
+    hr {
+        height: 5px; /* Sets the thickness of the line */
+        background-color: black; /* Sets the color of the line */
+        border: none; /* Removes the default border */
+    }
+
+    .card-body {
+      align-items: center;
+      height: 100%; /* Adjust height as needed */
+    }
+
+    .card-body.justify-center {
+      display: flex;
+      justify-content: center;
+    }
+
+    .card-title {
+      text-align: center;
+    }
+
+    .center-content {
+      flex: 1; /* This makes sure the link takes up the entire space of the flex container */
+    }
+
+    {% block extra_css %}
+    <!-- You can override this block in child templates to add extra CSS -->
+    {% endblock %}
+    </style>
+
+</head>
+
+<body>
+
+<!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="" class="logo d-flex align-items-center">
+        <img src="/static/assets/img/logo.png" alt="">
+        <span class="d-none d-lg-block">{% block logo_title %}Base template{% endblock %}</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle " href="#">
+            <i class="bi bi-search"></i>
+          </a>
+        </li><!-- End Search Icon-->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href=" url 'manage-subscription' ">
+          <i class="bi bi-grid"></i>
+          <span>{% trans 'Registrations' %}</span>
+        </a>
+      </li>
+
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href=" url 'subscriber-logout' ">
+          <i class="bi bi-person"></i>
+          <span>{% trans 'Logout' %}</span>
+        </a>
+      </li>
+
+    </ul><!-- End Sidebar Nav -->
+        <!-- End Profile Page Nav -->
+
+</aside><!-- End Sidebar-->
+
+
+
+
+{% block content %}
+{% endblock content %}
+
+
+
+<!-- ======= Footer ======= -->
+<footer id="footer" class="footer">
+    <div class="credits">
+    </div>
+</footer><!-- End Footer -->
+
+<!-- Single Modal for all buttons -->
+<div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">Help</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>-->
+<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>-->
+<!--<script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.13.1/b-2.3.3/b-html5-2.3.3/rr-1.3.1/sp-2.1.0/datatables.min.js"></script>-->
+
+
+<!--<script src="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.js"></script>-->
+
+<!-- Template Main JS File -->
+<!--<script src="/static/assets/js/main.js"></script>-->
+
+</body>
+
+<!--    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.3.2.min.js"></script>-->
+<!--    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.3.2.min.js"></script>-->
+<!--    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.3.2.min.js"></script>-->
+<!--    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-3.3.2.min.js"></script>-->
+<!--    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-gl-3.3.2.min.js"></script>-->
+<!--    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-mathjax-3.3.2.min.js"></script>-->
+
+{% block custom_script %}
+{% endblock custom_script %}
+
+</html>

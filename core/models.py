@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Question(models.Model):
-    question_text = models.CharField(max_length=200)
+    question_text = models.TextField(max_length=2000)
     pub_date = models.DateTimeField('date published')
     start_time = models.DateTimeField('start time')  # Poll start time
     end_time = models.DateTimeField('end time')      # Poll end time
