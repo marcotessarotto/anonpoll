@@ -10,23 +10,55 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import locale
+import os
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+STATICFILES_DIRS = (str(BASE_DIR.joinpath('static')),)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qhmor%_mw)ywr&esu9@*e%fhdab@h&o$xd#&%ll#eqipl18r_x'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
+
+STATIC_URL = 'static/'
+
+# Set up django-environ
+env = environ.Env(
+    # Default values for variables if not set
+    DEBUG=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(',')
 
+
+BASE_URL = env('BASE_URL')
+
+FROM_EMAIL = env('FROM_EMAIL')
+SUBJECT_EMAIL = env('SUBJECT_EMAIL')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_PORT = env('EMAIL_PORT')
+DEBUG_EMAIL = env('DEBUG_EMAIL')
+
+APPLICATION_TITLE = env('APPLICATION_TITLE')
+
+TECHNICAL_CONTACT_EMAIL = env('TECHNICAL_CONTACT_EMAIL')
+TECHNICAL_CONTACT = env('TECHNICAL_CONTACT')
+
+PRODUCT_NAME = env('PRODUCT_NAME')
+
+INTERNET_DOMAIN = env('INTERNET_DOMAIN')
 
 # Application definition
 
@@ -37,6 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'anonpoll.urls'
@@ -73,10 +107,19 @@ WSGI_APPLICATION = 'anonpoll.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# generate sql script to create database and user with generate_sql_script.py
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST', default='127.0.0.1'),  # default to localhost if DB_HOST is not set
+        'PORT': env('DB_PORT', default='3306'),  # default to 3306 if DB_PORT is not set
+        'AUTOCOMMIT': True,
+        'OPTIONS': {'charset': 'utf8mb4',
+                    'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+        # https://code.djangoproject.com/ticket/18392
     }
 }
 
@@ -103,21 +146,45 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'it-it'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Rome'
 
 USE_I18N = True
-
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Make sure your session cookies are persistent, not session-limited.
+# By default, Django's session cookies are set to expire when the user's browser is closed.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+SESSION_COOKIE_AGE = 1209600  # 2 weeks, in seconds
+
+# Languages you want to support in your application
+LANGUAGES = [
+    ('en', 'English'),
+    ('it', 'Italian'),
+    # Add more languages here
+]
+
+# Path where Django looks for translation files
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
+
+# https://chat.openai.com/share/7990bc3a-3107-4db8-919e-e81831308118
+
+# sudo apt-get install gettext
+
+# to collect strings for translation:
+# django-admin makemessages -l it  # For Italian
+
+# then compile the translation files:
+# django-admin compilemessages
+
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'

@@ -1,0 +1,11 @@
+<!-- core/templates/core/index.html -->
+<html>
+<body>
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="{% url 'core:detail' question.id %}">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
+
