@@ -69,12 +69,20 @@ input[type="submit"]:hover {
                 <form method="post">
                     {% csrf_token %}
                     {% for field in form %}
+                          {% if field.errors %}
+                            <div class="alert alert-danger">
+                              {% for error in field.errors %}
+                                <p>{{ error }}</p>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+
                         <div>
 
                             {% if field.name == 'choice' %}
                                 Ti invitiamo a selezionare la tua preferenza tra le opzioni disponibili per il sondaggio:<br><br>
                                 {% for radio in field %}
-                                    <label>{{ radio.tag }} {{ radio.choice_label }}</label><br><br>
+                                    <label>{{ radio.tag }}&nbsp;&nbsp;&nbsp;{{ radio.choice_label }}</label><br><br>
                                 {% endfor %}
                             {% elif field.name == 'accept_privacy_policy' %}
                                 accetti la privacy policy? (obbligatorio) {{ field }}<br><br>
@@ -88,9 +96,7 @@ input[type="submit"]:hover {
                             {% else %}
                                 {{ field }}
                             {% endif %}
-                            {% if field.errors %}
-                                <div class="error">{{ field.errors }}</div>
-                            {% endif %}
+
                         </div>
                     {% endfor %}
 

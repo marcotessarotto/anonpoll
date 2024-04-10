@@ -4,6 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
 
 from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT
 from anonpoll.view_tools import is_private_ip
@@ -96,7 +98,7 @@ def show_poll_question(request, question_slug):
                 return redirect('success_url')  # Replace 'success_url' with your actual success URL
             else:
                 # Handle the case where privacy policy is not accepted
-                form.add_error('accept_privacy_policy', 'You must accept the privacy policy to vote.')
+                form.add_error('accept_privacy_policy', _('You must accept the privacy policy to vote.'))
     else:
         form = VoteForm(question=question)
 
