@@ -1,12 +1,13 @@
 import syslog
 
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.utils import timezone
 
 from anonpoll.settings import DEBUG
 from anonpoll.view_tools import is_private_ip
+from .forms import VoteForm
 from .models import Choice, Question
 
 
@@ -82,13 +83,43 @@ def show_poll_question(request, question_slug):
     if request.COOKIES.get(cookie_name):
         return HttpResponse("You have already voted in this poll.")
 
+    if request.method == 'POST':
+        form = VoteForm(request.POST, question=question)
+        if form.is_valid():
+            choice = form.cleaned_data['choice']
+            accept_privacy_policy = form.cleaned_data['accept_privacy_policy']
+
+            if accept_privacy_policy == 'yes':
+                choice.votes += 1
+                choice.save()
+                # Redirect to a new URL to show the vote was successful
+                return redirect('success_url')  # Replace 'success_url' with your actual success URL
+            else:
+                # Handle the case where privacy policy is not accepted
+                form.add_error('accept_privacy_policy', 'You must accept the privacy policy to vote.')
+    else:
+        form = VoteForm(question=question)
+
+    context = {
+        'question': question,
+        'form': form,
+    }
+    return render(request, 'core/vote.html', context)
+
+
+
+
+
+
+
+
 
     if request.method == 'POST':
         pass
 
-
     context = {
         'question': question,
+        'choices': question.get_choices(randomize_choices=True),
     }
 
 

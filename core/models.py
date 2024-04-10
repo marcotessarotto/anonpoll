@@ -29,9 +29,15 @@ class Question(models.Model):
         now = timezone.now()
         return self.start_time <= now <= self.end_time
 
-    # Method to get all choices related to this question
-    def get_choices(self):
-        return self.choice_set.all()
+    # Modified method to get all choices related to this question
+    # with an optional parameter to randomize the choices
+    def get_choices(self, randomize_choices=False):
+        if randomize_choices:
+            # Randomize the order of returned choices
+            return self.choice_set.order_by('?')
+        else:
+            # Return choices in their default order
+            return self.choice_set.all()
 
 
 class Choice(models.Model):
