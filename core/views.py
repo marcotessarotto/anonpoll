@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.utils import timezone
 
-from anonpoll.settings import DEBUG
+from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT
 from anonpoll.view_tools import is_private_ip
 from .forms import VoteForm
 from .models import Choice, Question
@@ -103,6 +103,8 @@ def show_poll_question(request, question_slug):
     context = {
         'question': question,
         'form': form,
+        'TECHNICAL_CONTACT_EMAIL': TECHNICAL_CONTACT_EMAIL,
+        'TECHNICAL_CONTACT': TECHNICAL_CONTACT,
     }
     return render(request, 'core/vote.html', context)
 
