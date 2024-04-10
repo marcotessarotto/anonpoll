@@ -86,6 +86,7 @@ def show_poll_question(request, question_slug):
     if request.method == 'POST':
         pass
 
+
     context = {
         'question': question,
     }
