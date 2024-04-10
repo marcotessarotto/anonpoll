@@ -1,7 +1,12 @@
+import syslog
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
+
+from anonpoll.settings import DEBUG
+from anonpoll.view_tools import is_private_ip
 from .models import Choice, Question
 
 
@@ -52,3 +57,39 @@ def vote(request, question_id):
         response.set_cookie(f'has_voted_{question_id}', 'true', expires=question.end_time)
 
         return response
+
+
+def show_poll_question(request, question_slug):
+    http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
+
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        # Check if the IP is private
+        if http_real_ip != '' and not is_private_ip(http_real_ip) and not DEBUG:
+            syslog.syslog(syslog.LOG_ERR, f'IP address {http_real_ip} is not private')
+            return render(request, 'core/show_generic_message.html',
+                          {'message': "403 Forbidden - accesso consentito solo da intranet"}, status=403)
+
+    # get question by slug
+    question = get_object_or_404(Question, slug=question_slug)
+
+    print(f"Question: {question}")
+
+    if not question.is_active():
+        return HttpResponse("This poll is not active.")
+
+    cookie_name = f'has_voted_{question.ref_token}'
+
+    if request.COOKIES.get(cookie_name):
+        return HttpResponse("You have already voted in this poll.")
+
+
+    if request.method == 'POST':
+        pass
+
+    context = {
+        'question': question,
+    }
+
+
+
+    return None

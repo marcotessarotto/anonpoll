@@ -1,11 +1,24 @@
+import uuid
+
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Question(models.Model):
+    name = models.CharField(max_length=255, verbose_name=_("Nome"))
+
     question_text = models.TextField(max_length=2000)
-    pub_date = models.DateTimeField('date published')
+
     start_time = models.DateTimeField('start time')  # Poll start time
     end_time = models.DateTimeField('end time')      # Poll end time
+
+    slug = models.SlugField(max_length=255, unique=True)
+    ref_token = models.UUIDField(default=uuid.uuid4)
+
+    privacy_policy = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.question_text
@@ -16,8 +29,15 @@ class Question(models.Model):
         now = timezone.now()
         return self.start_time <= now <= self.end_time
 
+    # Method to get all choices related to this question
+    def get_choices(self):
+        return self.choice_set.all()
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
+    choice_text = models.CharField(max_length=512)
     votes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"id: {self.id} - choice_text: {self.choice_text} - votes: {self.votes}"
