@@ -25,7 +25,7 @@ STATICFILES_DIRS = (str(BASE_DIR.joinpath('static')),)
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
 # Set up django-environ
 env = environ.Env(
@@ -188,4 +188,12 @@ LOCALE_PATHS = [
 
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+USE_X_FORWARDED_HOST = True
+
+
+STATIC_SUFFIX = '/static/'
+STATIC_URL = 'polls' + STATIC_SUFFIX
+# MEDIA_SUFFIX = '/media/'
+# MEDIA_URL = FORCE_SCRIPT_NAME + MEDIA_SUFFIX
 

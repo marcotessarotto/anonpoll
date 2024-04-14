@@ -19,6 +19,8 @@ from django.contrib import admin
 
 url_prefix = 'polls/'
 
+# url_prefix = ''
+
 urlpatterns = [
     path(url_prefix + 'admin/', admin.site.urls),
     path(url_prefix + 's/', include('core.urls')),
