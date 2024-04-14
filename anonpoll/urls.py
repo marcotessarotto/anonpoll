@@ -17,9 +17,9 @@ Including another URLconf
 from django.urls import include, path
 from django.contrib import admin
 
-url_prefix = 'polls/'
+from anonpoll.settings import DEBUG
 
-# url_prefix = ''
+url_prefix = 'polls/' if not DEBUG else ''
 
 urlpatterns = [
     path(url_prefix + 'admin/', admin.site.urls),
