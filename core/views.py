@@ -1,5 +1,7 @@
+import locale
 import syslog
 
+import pytz
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -125,10 +127,31 @@ def success_url(request, question_slug):
     # get question by slug
     question = get_object_or_404(Question, slug=question_slug)
 
+    # Get the current date and time
+    # current_datetime = timezone.now()
+
+    # Set the locale to Italian
+    locale.setlocale(locale.LC_TIME, 'it_IT.utf8')
+    rome_tz = pytz.timezone("Europe/Rome")
+
+    if timezone.is_naive(question.end_time):
+        # If start_date is naive, make it aware using Europe/Rome timezone
+        end_date_aware = timezone.make_aware(question.end_time, rome_tz)
+        print("*1")
+    else:
+        # If start_date is already aware, just ensure it's using Europe/Rome timezone
+        end_date_aware = question.end_time.astimezone(rome_tz)
+        print("*2")
+
+    # Format the date in a common Italian format
+    formatted_date = end_date_aware.strftime("%d %B %Y, %H:%M")
+    print(formatted_date)
+
     context = {
         'question': question,
         'TECHNICAL_CONTACT_EMAIL': TECHNICAL_CONTACT_EMAIL,
         'TECHNICAL_CONTACT': TECHNICAL_CONTACT,
+        'end_date': formatted_date,
     }
 
     return render(request, 'core/thanks_poll_participation.html', context)
