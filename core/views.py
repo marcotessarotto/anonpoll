@@ -77,8 +77,6 @@ def show_poll_question(request, question_slug):
     # get question by slug
     question = get_object_or_404(Question, slug=question_slug)
 
-    # print(f"Question: {question}")
-
     if not question.is_active():
         return HttpResponse("This poll is not active.")
 
@@ -97,7 +95,17 @@ def show_poll_question(request, question_slug):
                 choice.votes += 1
                 choice.save()
                 # Redirect to a new URL to show the vote was successful
-                return redirect(f'/core/{question_slug}/success_url')  # Replace 'success_url' with your actual success URL
+                # return redirect(f'/core/{question_slug}/success_url')  # Replace 'success_url' with your actual success URL
+
+                # Always return an HttpResponseRedirect after successfully dealing
+                # with POST data. This prevents data from being posted twice if a
+                # user hits the Back button.
+                response = HttpResponseRedirect(reverse('core:success_url', args=(question_slug,)))
+
+                # Set the cookie to block re-voting, with expiration at the question's end time.
+                response.set_cookie(cookie_name, 'true', expires=question.end_time)
+
+                return response
             else:
                 # Handle the case where privacy policy is not accepted
                 form.add_error('accept_privacy_policy', _('You must accept the privacy policy to participate to the poll.'))
@@ -127,6 +135,9 @@ def success_url(request, question_slug):
     # get question by slug
     question = get_object_or_404(Question, slug=question_slug)
 
+    if not question.is_active():
+        return HttpResponse("This poll is not active.")
+
     # Get the current date and time
     # current_datetime = timezone.now()
 
@@ -137,11 +148,9 @@ def success_url(request, question_slug):
     if timezone.is_naive(question.end_time):
         # If start_date is naive, make it aware using Europe/Rome timezone
         end_date_aware = timezone.make_aware(question.end_time, rome_tz)
-        print("*1")
     else:
         # If start_date is already aware, just ensure it's using Europe/Rome timezone
-        end_date_aware = question.end_time.astimezone(rome_tz)
-        print("*2")
+        end_date_aware = question.end_time.astimezone(rome_tz)  # <====
 
     # Format the date in a common Italian format
     formatted_date = end_date_aware.strftime("%d %B %Y, %H:%M")
