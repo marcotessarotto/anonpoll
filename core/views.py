@@ -78,12 +78,12 @@ def show_poll_question(request, question_slug):
     question = get_object_or_404(Question, slug=question_slug)
 
     if not question.is_active():
-        return HttpResponse("This poll is not active.")
+        return HttpResponse(_("This poll is not active."))
 
     cookie_name = f'has_voted_{question.ref_token}'
 
     if request.COOKIES.get(cookie_name):
-        return HttpResponse("You have already voted in this poll.")
+        return HttpResponse(_("You have already voted in this poll."))
 
     if request.method == 'POST':
         form = VoteForm(request.POST, question=question)

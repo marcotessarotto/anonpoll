@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-14 14:41+0200\n"
+"POT-Creation-Date: 2024-04-14 15:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,11 +34,35 @@ msgstr ""
 msgid "Nome"
 msgstr ""
 
-#: core/templates/core/vote.html:126
+#: core/models.py:43
+msgid "Sondaggio"
+msgstr ""
+
+#: core/models.py:44
+msgid "Sondaggi"
+msgstr ""
+
+#: core/models.py:60
+msgid "Scelta di sondaggio"
+msgstr ""
+
+#: core/models.py:61
+msgid "Scelte di sondaggio"
+msgstr ""
+
+#: core/templates/core/vote.html:131
 msgid "For technical IT support, contact"
 msgstr "Per supporto tecnico informatico, contattare"
 
-#: core/views.py:101
+#: core/views.py:81
+msgid "This poll is not active."
+msgstr "Questo sondaggio non è attivo."
+
+#: core/views.py:86
+msgid "You have already voted in this poll."
+msgstr "Hai già partecipato a questo sondaggio."
+
+#: core/views.py:111
 msgid "You must accept the privacy policy to participate to the poll."
 msgstr "Devi accettare la privacy policy per poter partecipare al sondaggio."
 
