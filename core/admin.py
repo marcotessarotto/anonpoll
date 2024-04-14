@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import Question, Choice
+from .models import Question, Choice, ChoiceVote
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -50,3 +50,19 @@ class ChoiceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Choice, ChoiceAdmin)
+
+
+class ChoiceVoteAdmin(admin.ModelAdmin):
+    list_display = ('question', 'choice', 'voted_at')
+    list_filter = ('question', 'choice', 'voted_at')
+    search_fields = ('question__text', 'choice__choice_text', 'voted_at')
+    date_hierarchy = 'voted_at'
+    ordering = ('-voted_at',)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(ChoiceVoteAdmin, self).get_form(request, obj, **kwargs)
+        # Customizations here
+        return form
+
+admin.site.register(ChoiceVote, ChoiceVoteAdmin)
+

@@ -1,5 +1,6 @@
 import locale
 import syslog
+from datetime import date
 
 import pytz
 from django.http import HttpResponse, HttpResponseRedirect
@@ -12,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT
 from anonpoll.view_tools import is_private_ip
 from .forms import VoteForm
-from .models import Choice, Question
+from .models import Choice, Question, ChoiceVote
 
 
 def index(request):
@@ -94,8 +95,15 @@ def show_poll_question(request, question_slug):
             if accept_privacy_policy == 'yes':
                 choice.votes += 1
                 choice.save()
-                # Redirect to a new URL to show the vote was successful
-                # return redirect(f'/core/{question_slug}/success_url')  # Replace 'success_url' with your actual success URL
+
+                # Create a new ChoiceVote instance
+                new_vote = ChoiceVote(
+                    question=question,
+                    choice=choice,
+                    voted_at=date.today()
+                )
+
+                new_vote.save()
 
                 # Always return an HttpResponseRedirect after successfully dealing
                 # with POST data. This prevents data from being posted twice if a

@@ -60,3 +60,14 @@ class Choice(models.Model):
         verbose_name = _("Scelta di sondaggio")
         verbose_name_plural = _("Scelte di sondaggio")
         ordering = ('-votes',)
+
+
+class ChoiceVote(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
+    voted_at = models.DateField(null=False, blank=False)
+
+    class Meta:
+        verbose_name = _("Voto di un sondaggio")
+        verbose_name_plural = _("Voti di sondaggi")
+        ordering = ('-id',)
