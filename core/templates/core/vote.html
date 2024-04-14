@@ -44,7 +44,6 @@ input[type="submit"]:hover {
 }
 
 
-
 {% endblock extra_css %}
 
 
@@ -88,10 +87,13 @@ input[type="submit"]:hover {
                                 accetti la privacy policy? (obbligatorio) {{ field }}<br><br>
 
                                 {% if question.privacy_policy %}
-                                    <div>
-                                        <label>Privacy Policy:</label>
-                                        <p>{{ question.privacy_policy|safe }}</p>
+                                    <div class="card">
+
+                                        <div class="card-body">
+                                            <p class="card-text">privacy policy: {{ question.privacy_policy|safe }}</p>
+                                        </div>
                                     </div>
+
                                 {% endif %}
                             {% else %}
                                 {{ field }}
@@ -113,20 +115,20 @@ input[type="submit"]:hover {
       </div>
 
 
-      <div class="row">
-        <div class="col-lg-12">
+<!--      <div class="row">-->
+<!--        <div class="col-lg-12">-->
 
-          <div class="card">
-            <div class="card-body">
-                <br>
-                <p>{% trans 'For technical IT support, contact' %}
-                    <a href="mailto:{{ TECHNICAL_CONTACT_EMAIL }}">{{ TECHNICAL_CONTACT }}</a></p>
+<!--          <div class="card">-->
+<!--            <div class="card-body">-->
+<!--                <br>-->
+<!--                <p>{% trans 'For technical IT support, contact' %}-->
+<!--                    <a href="mailto:{{ TECHNICAL_CONTACT_EMAIL }}">{{ TECHNICAL_CONTACT }}</a></p>-->
 
-            </div>
-          </div>
+<!--            </div>-->
+<!--          </div>-->
 
-        </div>
-      </div>
+<!--        </div>-->
+<!--      </div>-->
 
     </section>
 
@@ -145,20 +147,3 @@ input[type="submit"]:hover {
     {% endfor %}
 </ul>
 {% endif %}
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Vote</title>
-</head>
-<body>
-
-</body>
-</html>

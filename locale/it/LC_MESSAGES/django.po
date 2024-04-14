@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-10 18:31+0200\n"
+"POT-Creation-Date: 2024-04-14 14:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,21 +34,13 @@ msgstr ""
 msgid "Nome"
 msgstr ""
 
-#: core/templates/base.html:111
-msgid "Registrations"
-msgstr ""
-
-#: core/templates/base.html:119
-msgid "Logout"
-msgstr ""
-
-#: core/templates/core/vote.html:124
+#: core/templates/core/vote.html:126
 msgid "For technical IT support, contact"
 msgstr "Per supporto tecnico informatico, contattare"
 
 #: core/views.py:101
-msgid "You must accept the privacy policy to vote."
-msgstr "Devi accettare la privacy policy per votare."
+msgid "You must accept the privacy policy to participate to the poll."
+msgstr "Devi accettare la privacy policy per poter partecipare al sondaggio."
 
 #: venv/lib/python3.11/site-packages/bootstrap5/components.py:17
 #: venv/lib/python3.11/site-packages/bootstrap5/templates/bootstrap5/form_errors.html:3

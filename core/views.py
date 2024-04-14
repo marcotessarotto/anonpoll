@@ -98,7 +98,7 @@ def show_poll_question(request, question_slug):
                 return redirect('success_url')  # Replace 'success_url' with your actual success URL
             else:
                 # Handle the case where privacy policy is not accepted
-                form.add_error('accept_privacy_policy', _('You must accept the privacy policy to vote.'))
+                form.add_error('accept_privacy_policy', _('You must accept the privacy policy to participate to the poll.'))
     else:
         form = VoteForm(question=question)
 
