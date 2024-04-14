@@ -75,7 +75,7 @@ def show_poll_question(request, question_slug):
     # get question by slug
     question = get_object_or_404(Question, slug=question_slug)
 
-    print(f"Question: {question}")
+    # print(f"Question: {question}")
 
     if not question.is_active():
         return HttpResponse("This poll is not active.")
@@ -95,7 +95,7 @@ def show_poll_question(request, question_slug):
                 choice.votes += 1
                 choice.save()
                 # Redirect to a new URL to show the vote was successful
-                return redirect('success_url')  # Replace 'success_url' with your actual success URL
+                return redirect(f'/core/{question_slug}/success_url')  # Replace 'success_url' with your actual success URL
             else:
                 # Handle the case where privacy policy is not accepted
                 form.add_error('accept_privacy_policy', _('You must accept the privacy policy to participate to the poll.'))
@@ -111,21 +111,24 @@ def show_poll_question(request, question_slug):
     return render(request, 'core/vote.html', context)
 
 
+def success_url(request, question_slug):
 
+    http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
 
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        # Check if the IP is private
+        if http_real_ip != '' and not is_private_ip(http_real_ip) and not DEBUG:
+            syslog.syslog(syslog.LOG_ERR, f'IP address {http_real_ip} is not private')
+            return render(request, 'core/show_generic_message.html',
+                          {'message': "403 Forbidden - accesso consentito solo da intranet"}, status=403)
 
-
-
-
-
-    if request.method == 'POST':
-        pass
+    # get question by slug
+    question = get_object_or_404(Question, slug=question_slug)
 
     context = {
         'question': question,
-        'choices': question.get_choices(randomize_choices=True),
+        'TECHNICAL_CONTACT_EMAIL': TECHNICAL_CONTACT_EMAIL,
+        'TECHNICAL_CONTACT': TECHNICAL_CONTACT,
     }
 
-
-
-    return None
+    return render(request, 'core/thanks_poll_participation.html', context)

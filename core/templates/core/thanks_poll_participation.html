@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}Grazie per avere partecipato al sondaggio{% endblock %}
+{% block logo_title %}Sondaggio{% endblock %}
+
+{% block extra_css %}
+
+
+input[type="checkbox"][name^="event_"] {
+    transform: scale(5); /* Adjust the scaling factor as needed */
+    margin: 50px; /* Optional: adds some margin around the checkbox */
+    cursor: pointer; /* Optional: changes the cursor to a pointer on hover */
+    padding: 80px;
+}
+
+input[type="submit"] {
+    transform: scale(2); /* Adjust the scaling factor as needed */
+    padding: 10px 60px; /* Increase padding to make the button larger */
+    font-size: 16px; /* Increase font size for better visibility */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    border: none; /* Optional: Removes the border */
+    border-radius: 5px; /* Optional: Adds rounded corners to the button */
+    background-color: #007bff; /* Optional: Changes background color */
+    color: white; /* Optional: Changes text color */
+    transition: background-color 0.3s; /* Optional: Adds a transition effect when hovering */
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3; /* Optional: Changes background color on hover for visual feedback */
+}
+
+.table, .table th, .table td {
+    border: 1px solid black; /* Adds a solid border around the table, and each cell */
+}
+
+
+.uniform-table {
+    width: 80%; /* Sets the width of the table to 80% of its container's width */
+    min-width: 400px; /* Sets a minimum width for the table */
+    margin-left: auto; /* These two margin properties center the table in its container */
+    margin-right: auto;
+    border-collapse: collapse; /* Optional: Ensures that the border is neat */
+}
+
+
+{% endblock extra_css %}
+
+
+{% block content %}
+
+
+
+  <main id="main" class="main">
+
+    <section class="section">
+
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+                <br>
+
+                <h1>Grazie per avere partecipato al sondaggio.<br>
+                    I risultati verranno resi noti dall'organizzatore dopo la conclusione del sondaggio.</h1>
+                <br>
+
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+    </section>
+
+  </main><!-- End #main -->
+
+
+{% endblock content %}
+
+
+
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}

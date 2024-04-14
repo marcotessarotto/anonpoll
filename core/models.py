@@ -39,6 +39,11 @@ class Question(models.Model):
             # Return choices in their default order
             return self.choice_set.all()
 
+    class Meta:
+        verbose_name = _("Sondaggio")
+        verbose_name_plural = _("Sondaggi")
+        ordering = ('-created_at',)
+
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
@@ -50,3 +55,8 @@ class Choice(models.Model):
 
     def __str__(self):
         return f"{self.choice_text}"
+
+    class Meta:
+        verbose_name = _("Scelta di sondaggio")
+        verbose_name_plural = _("Scelte di sondaggio")
+        ordering = ('-votes',)

@@ -36,4 +36,17 @@ class QuestionAdmin(admin.ModelAdmin):
 
 admin.site.register(Question, QuestionAdmin)
 
-admin.site.register(Choice)
+
+class ChoiceAdmin(admin.ModelAdmin):
+    list_display = ('choice_text', 'votes', 'question')
+    list_filter = ('question',)
+    search_fields = ('choice_text',)
+    raw_id_fields = ('question',)
+
+    def view_question_text(self, obj):
+        return obj.question.question_text
+
+    view_question_text.short_description = 'Question Text'
+
+
+admin.site.register(Choice, ChoiceAdmin)
