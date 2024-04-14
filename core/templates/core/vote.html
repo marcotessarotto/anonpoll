@@ -65,7 +65,7 @@ input[type="submit"]:hover {
                 <h1>{{ question.question_text }}</h1>
                 <br>
 
-                <form method="post">
+                <form method="post" id="voteForm">
                     {% csrf_token %}
                     {% for field in form %}
                           {% if field.errors %}
@@ -102,11 +102,18 @@ input[type="submit"]:hover {
                         </div>
                     {% endfor %}
 
-                    <button type="submit">Partecipa al sondaggio</button>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="confirmVote()">Partecipa al sondaggio</button>
+
                 </form>
 
 
-
+<script>
+function confirmVote() {
+    if (confirm('Confermi la tua scelta?')) {
+        document.getElementById('voteForm').submit();
+    }
+}
+</script>
 
             </div>
           </div>
