@@ -35,13 +35,13 @@ class Question(models.Model):
 
     # Modified method to get all choices related to this question
     # with an optional parameter to randomize the choices
-    def get_choices(self, randomize_choices=False):
-        if randomize_choices:
+    def get_choices(self, sorted=False):
+        if not sorted:
             # Randomize the order of returned choices
             return self.choice_set.order_by('?')
         else:
             # Return choices in their default order
-            return self.choice_set.all()
+            return self.choice_set.order_by('choice_text')
 
     class Meta:
         verbose_name = _("Sondaggio")

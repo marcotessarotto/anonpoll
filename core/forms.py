@@ -10,4 +10,4 @@ class VoteForm(forms.Form):
     def __init__(self, *args, **kwargs):
         question = kwargs.pop('question')
         super().__init__(*args, **kwargs)
-        self.fields['choice'].queryset = question.get_choices(randomize_choices=True)
+        self.fields['choice'].queryset = question.get_choices(sorted=question.choices_are_sorted)

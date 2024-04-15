@@ -84,13 +84,13 @@ input[type="submit"]:hover {
                                     <label>{{ radio.tag }}&nbsp;&nbsp;&nbsp;{{ radio.choice_label }}</label><br><br>
                                 {% endfor %}
                             {% elif field.name == 'accept_privacy_policy' %}
-                                accetti la privacy policy? (obbligatorio) {{ field }}<br><br>
+                                <br>accetti la privacy policy? (obbligatorio) {{ field }}<br><br>
 
                                 {% if question.privacy_policy %}
                                     <div class="card">
 
                                         <div class="card-body">
-                                            <p class="card-text">privacy policy: {{ question.privacy_policy|safe }}</p>
+                                            <p class="card-text">privacy policy: <br>{{ question.privacy_policy|safe }}</p>
                                         </div>
                                     </div>
 
