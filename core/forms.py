@@ -2,20 +2,20 @@ from django import forms
 from .models import Choice
 from django.utils.translation import gettext_lazy as _
 
-class VoteFormV1(forms.Form):
-    choice = forms.ModelChoiceField(queryset=None, widget=forms.RadioSelect, empty_label=None)
-    accept_privacy_policy = forms.ChoiceField(choices=[('yes', 'Sì'), ('no', 'No')], label="Accetti la privacy policy?",
-                                              widget=forms.Select)
-
-    def __init__(self, *args, **kwargs):
-        question = kwargs.pop('question')
-        super().__init__(*args, **kwargs)
-        self.fields['choice'].queryset = question.get_choices(sorted=question.choices_are_sorted)
+# class VoteFormV1(forms.Form):
+#     choice = forms.ModelChoiceField(queryset=None, widget=forms.RadioSelect, empty_label=None)
+#     accept_privacy_policy = forms.ChoiceField(choices=[('yes', 'Sì'), ('no', 'No')], label="Accetti la privacy policy?",
+#                                               widget=forms.Select)
+#
+#     def __init__(self, *args, **kwargs):
+#         question = kwargs.pop('question')
+#         super().__init__(*args, **kwargs)
+#         self.fields['choice'].queryset = question.get_choices(sorted=question.choices_are_sorted)
 
 
 class VoteForm(forms.Form):  # WithTextField
     choice = forms.ModelChoiceField(queryset=None, widget=forms.RadioSelect, empty_label=None)
-    text_choice = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Enter your choice'}))
+    text_choice = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Scrivi la tua scelta qui...'}))
     accept_privacy_policy = forms.ChoiceField(choices=[('scegli', 'scegli'), ('yes', 'Sì'), ('no', 'No')], label="Accetti la privacy policy?", widget=forms.Select)
 
     def __init__(self, *args, **kwargs):
