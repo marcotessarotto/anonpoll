@@ -17,6 +17,10 @@ class Question(models.Model):
 
     privacy_policy = models.TextField(blank=True, null=True)
 
+    choices_are_sorted = models.BooleanField(default=True)
+
+    enable_textfield_choice = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -45,13 +49,24 @@ class Question(models.Model):
         ordering = ('-created_at',)
 
 
-class Choice(models.Model):
+class ChoiceSuggestedByUser(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=512)
     votes = models.IntegerField(default=0)
 
-    def __str__2(self):
-        return f"id: {self.id} - choice_text: {self.choice_text} - votes: {self.votes}"
+    def __str__(self):
+        return f"{self.choice_text}"
+
+    class Meta:
+        verbose_name = _("Scelta suggerita dall'utente")
+        verbose_name_plural = _("Scelte suggerite dagli utenti")
+        ordering = ('choice_text',)
+
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=512)
+    votes = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.choice_text}"
@@ -71,3 +86,15 @@ class ChoiceVote(models.Model):
         verbose_name = _("Voto di un sondaggio")
         verbose_name_plural = _("Voti di sondaggi")
         ordering = ('-id',)
+
+
+class ChoiceVoteSuggestedByUser(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice = models.ForeignKey(ChoiceSuggestedByUser, on_delete=models.CASCADE)
+    voted_at = models.DateField(null=False, blank=False)
+
+    class Meta:
+        verbose_name = _("Voto di un sondaggio suggerito dall'utente")
+        verbose_name_plural = _("Voti di sondaggi suggeriti dagli utenti")
+        ordering = ('-id',)
+

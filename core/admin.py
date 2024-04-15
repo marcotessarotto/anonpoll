@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import Question, Choice, ChoiceVote
+from .models import Question, Choice, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -12,7 +12,7 @@ class QuestionAdmin(admin.ModelAdmin):
     list_filter = ('start_time', 'end_time', 'created_at', 'updated_at')
     # Adding fieldsets for structured form layout
     fieldsets = (
-        (_('Question Information'), {'fields': ('name', 'question_text', 'slug', 'ref_token', 'privacy_policy')}),
+        (_('Question Information'), {'fields': ('name', 'question_text', 'slug', 'ref_token', 'privacy_policy','choices_are_sorted', 'enable_textfield_choice')}),
         (_('Timing'), {'fields': ('start_time', 'end_time')}),
         (_('Metadata'), {'fields': ('created_at', 'updated_at')}),
     )
@@ -64,5 +64,25 @@ class ChoiceVoteAdmin(admin.ModelAdmin):
         # Customizations here
         return form
 
+
 admin.site.register(ChoiceVote, ChoiceVoteAdmin)
+
+
+class ChoiceSuggestedByUserAdmin(admin.ModelAdmin):
+    list_display = ('choice_text', 'question', 'votes')  # Fields to display in the admin list view
+    list_filter = ('question',)  # Allow filtering by the question
+    search_fields = (
+    'choice_text', 'question__text')  # Enable a search box that searches the choice text and related question text
+
+
+admin.site.register(ChoiceSuggestedByUser, ChoiceSuggestedByUserAdmin)
+
+
+class ChoiceVoteSuggestedByUserAdmin(admin.ModelAdmin):
+    list_display = ('question', 'choice', 'voted_at')  # Display these fields in the admin list view
+    list_filter = ('question', 'choice', 'voted_at')  # Enable filtering by these fields
+    search_fields = ('question__text', 'choice__choice_text')  # Search by question text and choice text
+    date_hierarchy = 'voted_at'  # Provide a drill-down by date
+
+admin.site.register(ChoiceVoteSuggestedByUser, ChoiceVoteSuggestedByUserAdmin)
 
