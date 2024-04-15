@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-15 18:53+0200\n"
+"POT-Creation-Date: 2024-04-15 18:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,9 +30,9 @@ msgstr ""
 msgid "Metadata"
 msgstr ""
 
-#: core/forms.py:45 venv/lib/python3.11/site-packages/django/forms/fields.py:91
-msgid "This field is required."
-msgstr "Questo campo è obbligatorio."
+#: core/forms.py:45
+msgid "Choose an option."
+msgstr "Scegli una opzione."
 
 #: core/forms.py:50
 msgid "The text choice is required."
@@ -94,7 +94,7 @@ msgstr "Questo sondaggio non è attivo."
 msgid "You have already voted in this poll."
 msgstr "Hai già partecipato a questo sondaggio."
 
-#: core/views.py:121
+#: core/views.py:122
 msgid "You must accept the privacy policy to participate to the poll."
 msgstr "Devi accettare la privacy policy per poter partecipare al sondaggio."
 
@@ -555,6 +555,10 @@ msgstr ""
 #: venv/lib/python3.11/site-packages/django/forms/boundfield.py:184
 msgid ":?.!"
 msgstr ""
+
+#: venv/lib/python3.11/site-packages/django/forms/fields.py:91
+msgid "This field is required."
+msgstr "Questo campo è obbligatorio."
 
 #: venv/lib/python3.11/site-packages/django/forms/fields.py:298
 msgid "Enter a whole number."

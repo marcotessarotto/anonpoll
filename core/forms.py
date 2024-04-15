@@ -16,7 +16,7 @@ class VoteFormV1(forms.Form):
 class VoteForm(forms.Form):  # WithTextField
     choice = forms.ModelChoiceField(queryset=None, widget=forms.RadioSelect, empty_label=None)
     text_choice = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': 'Enter your choice'}))
-    accept_privacy_policy = forms.ChoiceField(choices=[('yes', 'Sì'), ('no', 'No')], label="Accetti la privacy policy?", widget=forms.Select)
+    accept_privacy_policy = forms.ChoiceField(choices=[('scegli', 'scegli'), ('yes', 'Sì'), ('no', 'No')], label="Accetti la privacy policy?", widget=forms.Select)
 
     def __init__(self, *args, **kwargs):
         question = kwargs.pop('question')
@@ -29,20 +29,20 @@ class VoteForm(forms.Form):  # WithTextField
     def is_valid(self):
         valid = super().is_valid()
 
-        print(f"Valid: {valid}")
+        # print(f"Valid: {valid}")
         if not valid:
             return False
 
         choice = self.cleaned_data.get('choice', None)
         text_choice = self.cleaned_data.get('text_choice', None)
 
-        print(f"choice: {choice}")
-        print(f"text_choice: {text_choice}")
-
-        print(f"self.cleaned_data: {self.cleaned_data}")
+        # print(f"choice: {choice}")
+        # print(f"text_choice: {text_choice}")
+        #
+        # print(f"self.cleaned_data: {self.cleaned_data}")
 
         if choice is None:
-            self.add_error('choice', _('This field is required.'))
+            self.add_error('choice', _('Choose an option.'))
             return False
 
         if choice.choice_text == 'ZZZ_USER_DEFINED':
@@ -50,7 +50,7 @@ class VoteForm(forms.Form):  # WithTextField
                 self.add_error('text_choice', _('The text choice is required.'))
                 return False
             else:
-                print("Text choice is valid")
+                # print("Text choice is valid")
                 return True
         elif choice is not None:
             return True

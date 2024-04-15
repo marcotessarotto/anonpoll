@@ -91,6 +91,7 @@ def show_poll_question(request, question_slug):
         if form.is_valid():
             choice = form.cleaned_data['choice']
             accept_privacy_policy = form.cleaned_data['accept_privacy_policy']
+            text_choice = form.cleaned_data.get('text_choice', None)
 
             print(f"form.cleaned_data: {form.cleaned_data}")
 
