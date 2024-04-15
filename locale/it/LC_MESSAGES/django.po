@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-14 15:42+0200\n"
+"POT-Creation-Date: 2024-04-15 18:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,35 +34,59 @@ msgstr ""
 msgid "Nome"
 msgstr ""
 
-#: core/models.py:43
+#: core/models.py:47
 msgid "Sondaggio"
 msgstr ""
 
-#: core/models.py:44
+#: core/models.py:48
 msgid "Sondaggi"
 msgstr ""
 
-#: core/models.py:60
+#: core/models.py:61
+msgid "Scelta suggerita dall'utente"
+msgstr ""
+
+#: core/models.py:62
+msgid "Scelte suggerite dagli utenti"
+msgstr ""
+
+#: core/models.py:75
 msgid "Scelta di sondaggio"
 msgstr ""
 
-#: core/models.py:61
+#: core/models.py:76
 msgid "Scelte di sondaggio"
 msgstr ""
 
-#: core/templates/core/vote.html:131
+#: core/models.py:86
+msgid "Voto di un sondaggio"
+msgstr ""
+
+#: core/models.py:87
+msgid "Voti di sondaggi"
+msgstr ""
+
+#: core/models.py:97
+msgid "Voto di un sondaggio suggerito dall'utente"
+msgstr ""
+
+#: core/models.py:98
+msgid "Voti di sondaggi suggeriti dagli utenti"
+msgstr ""
+
+#: core/templates/core/vote.html:132
 msgid "For technical IT support, contact"
 msgstr "Per supporto tecnico informatico, contattare"
 
-#: core/views.py:81
+#: core/views.py:82
 msgid "This poll is not active."
 msgstr "Questo sondaggio non è attivo."
 
-#: core/views.py:86
+#: core/views.py:87
 msgid "You have already voted in this poll."
 msgstr "Hai già partecipato a questo sondaggio."
 
-#: core/views.py:111
+#: core/views.py:121
 msgid "You must accept the privacy policy to participate to the poll."
 msgstr "Devi accettare la privacy policy per poter partecipare al sondaggio."
 
@@ -526,7 +550,7 @@ msgstr ""
 
 #: venv/lib/python3.11/site-packages/django/forms/fields.py:91
 msgid "This field is required."
-msgstr ""
+msgstr "Questo campo è obbligatorio."
 
 #: venv/lib/python3.11/site-packages/django/forms/fields.py:298
 msgid "Enter a whole number."
