@@ -80,7 +80,7 @@ class Choice(models.Model):
 class ChoiceVote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
-    voted_at = models.DateField(null=False, blank=False)
+    # voted_at = models.DateField(null=False, blank=False)
 
     class Meta:
         verbose_name = _("Voto di un sondaggio")
@@ -91,7 +91,7 @@ class ChoiceVote(models.Model):
 class ChoiceVoteSuggestedByUser(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.ForeignKey(ChoiceSuggestedByUser, on_delete=models.CASCADE)
-    voted_at = models.DateField(null=False, blank=False)
+    # voted_at = models.DateField(null=False, blank=False)
 
     class Meta:
         verbose_name = _("Voto di un sondaggio suggerito dall'utente")

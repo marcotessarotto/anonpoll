@@ -53,11 +53,10 @@ admin.site.register(Choice, ChoiceAdmin)
 
 
 class ChoiceVoteAdmin(admin.ModelAdmin):
-    list_display = ('question', 'choice', 'voted_at')
-    list_filter = ('question', 'choice', 'voted_at')
-    search_fields = ('question__text', 'choice__choice_text', 'voted_at')
-    date_hierarchy = 'voted_at'
-    ordering = ('-voted_at',)
+    list_display = ('question', 'choice', )
+    list_filter = ('question', 'choice', )
+    search_fields = ('question__text', 'choice__choice_text',)
+    ordering = ('-id',)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ChoiceVoteAdmin, self).get_form(request, obj, **kwargs)
@@ -79,10 +78,11 @@ admin.site.register(ChoiceSuggestedByUser, ChoiceSuggestedByUserAdmin)
 
 
 class ChoiceVoteSuggestedByUserAdmin(admin.ModelAdmin):
-    list_display = ('question', 'choice', 'voted_at')  # Display these fields in the admin list view
-    list_filter = ('question', 'choice', 'voted_at')  # Enable filtering by these fields
+    list_display = ('question', 'choice', )  # Display these fields in the admin list view
+    list_filter = ('question', 'choice', )  # Enable filtering by these fields
     search_fields = ('question__text', 'choice__choice_text')  # Search by question text and choice text
-    date_hierarchy = 'voted_at'  # Provide a drill-down by date
+    ordering = ('-id',)
+
 
 admin.site.register(ChoiceVoteSuggestedByUser, ChoiceVoteSuggestedByUserAdmin)
 
