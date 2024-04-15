@@ -101,3 +101,14 @@ class ChoiceVoteSuggestedByUser(models.Model):
         verbose_name_plural = _("Voti di sondaggi suggeriti dagli utenti")
         ordering = ('-id',)
 
+
+def question_reset_votes(question):
+    for choice in question.choice_set.all():
+        choice.votes = 0
+        choice.save()
+
+    ChoiceVote.objects.filter(question=question).delete()
+    ChoiceVoteSuggestedByUser.objects.filter(question=question).delete()
+
+    ChoiceSuggestedByUser.objects.filter(question=question).delete()
+
