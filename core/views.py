@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT
 from anonpoll.view_tools import is_private_ip
 from .forms import VoteForm
-from .models import Choice, Question, ChoiceVote
+from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser
 
 
 def index(request):
@@ -96,16 +96,43 @@ def show_poll_question(request, question_slug):
             print(f"form.cleaned_data: {form.cleaned_data}")
 
             if accept_privacy_policy == 'yes':
-                choice.votes += 1
-                choice.save()
 
-                # Create a new ChoiceVote instance
-                new_vote = ChoiceVote(
-                    question=question,
-                    choice=choice,
-                )
+                if choice.is_choice_text_user_defined():
+                    # If the user's choice is a user-defined choice, lookup for an instance with the same choice_text
+                    # and question, if it exists, increment the votes, otherwise create a new instance
+                    user_choice = ChoiceSuggestedByUser.objects.filter(
+                        question=question,
+                        choice_text=text_choice,
+                    ).first()
 
-                new_vote.save()
+                    if user_choice is None:
+                        user_choice = ChoiceSuggestedByUser(
+                            question=question,
+                            choice_text=text_choice,
+                            votes=1,
+                        )
+                    else:
+                        user_choice.votes += 1
+
+                    user_choice.save()
+
+                    new_vote = ChoiceVoteSuggestedByUser(
+                        question=question,
+                        choice=user_choice,
+                    )
+                    new_vote.save()
+
+                else:
+                    choice.votes += 1
+                    choice.save()
+
+                    # Create a new ChoiceVote instance
+                    new_vote = ChoiceVote(
+                        question=question,
+                        choice=choice,
+                    )
+
+                    new_vote.save()
 
                 # Always return an HttpResponseRedirect after successfully dealing
                 # with POST data. This prevents data from being posted twice if a

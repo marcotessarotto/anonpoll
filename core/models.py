@@ -71,6 +71,9 @@ class Choice(models.Model):
     def __str__(self):
         return f"{self.choice_text}"
 
+    def is_choice_text_user_defined(self):
+        return self.choice_text == 'ZZZ_USER_DEFINED'
+
     class Meta:
         verbose_name = _("Scelta di sondaggio")
         verbose_name_plural = _("Scelte di sondaggio")
