@@ -68,42 +68,43 @@ input[type="submit"]:hover {
                 <form method="post" id="voteForm">
                     {% csrf_token %}
                     {% for field in form %}
-                          {% if field.errors %}
+                        {% if field.errors %}
                             <div class="alert alert-danger">
-                              {% for error in field.errors %}
-                                <p>{{ error }}</p>
-                              {% endfor %}
+                                {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
                             </div>
-                          {% endif %}
+                        {% endif %}
 
                         <div>
-
                             {% if field.name == 'choice' %}
                                 Ti invitiamo a selezionare la tua preferenza tra le opzioni disponibili per il sondaggio:<br><br>
                                 {% for radio in field %}
-                                    <label>{{ radio.tag }}&nbsp;&nbsp;&nbsp;{{ radio.choice_label }}</label><br><br>
+
+                                    {% if radio.choice_label == 'ZZZ_USER_DEFINED' and question.enable_textfield_choice %}
+                                        <label>{{ radio.tag }}&nbsp;&nbsp;&nbsp;specifica la tua scelta: {{ form.text_choice }}</label><br><br>
+                                    {% else %}
+                                        <label>{{ radio.tag }}&nbsp;&nbsp;&nbsp;{{ radio.choice_label }}</label><br><br>
+                                    {% endif %}
                                 {% endfor %}
+                            {% elif field.name == 'text_choice' %}
+
                             {% elif field.name == 'accept_privacy_policy' %}
                                 <br>accetti la privacy policy? (obbligatorio) {{ field }}<br><br>
-
                                 {% if question.privacy_policy %}
                                     <div class="card">
-
                                         <div class="card-body">
                                             <p class="card-text">privacy policy: <br>{{ question.privacy_policy|safe }}</p>
                                         </div>
                                     </div>
-
                                 {% endif %}
                             {% else %}
                                 {{ field }}
                             {% endif %}
-
                         </div>
                     {% endfor %}
 
                     <button type="button" class="btn btn-primary btn-lg" onclick="confirmVote()">Partecipa al sondaggio</button>
-
                 </form>
 
 

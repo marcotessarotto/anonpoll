@@ -92,6 +92,8 @@ def show_poll_question(request, question_slug):
             choice = form.cleaned_data['choice']
             accept_privacy_policy = form.cleaned_data['accept_privacy_policy']
 
+            print(f"form.cleaned_data: {form.cleaned_data}")
+
             if accept_privacy_policy == 'yes':
                 choice.votes += 1
                 choice.save()
@@ -100,7 +102,6 @@ def show_poll_question(request, question_slug):
                 new_vote = ChoiceVote(
                     question=question,
                     choice=choice,
-                    voted_at=date.today()
                 )
 
                 new_vote.save()
@@ -110,8 +111,9 @@ def show_poll_question(request, question_slug):
                 # user hits the Back button.
                 response = HttpResponseRedirect(reverse('core:success_url', args=(question_slug,)))
 
-                # Set the cookie to block re-voting, with expiration at the question's end time.
-                response.set_cookie(cookie_name, 'true', expires=question.end_time)
+                if not DEBUG:
+                    # Set the cookie to block re-voting, with expiration at the question's end time.
+                    response.set_cookie(cookie_name, 'true', expires=question.end_time)
 
                 return response
             else:
