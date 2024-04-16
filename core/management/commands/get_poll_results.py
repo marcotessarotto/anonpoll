@@ -1,6 +1,44 @@
+import smtplib
+import textwrap
+from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from django.core.management import BaseCommand
 
+from anonpoll.settings import TECHNICAL_CONTACT_EMAIL
 from core.models import Question, question_reset_votes
+
+
+smtp_server = "localhost"
+smtp_port = 25
+
+
+def send_email(subject, body, from_email, to_email):
+
+    # Wrap the body text to ensure no line exceeds the SMTP limit
+    # wrapped_body = "\n".join(textwrap.wrap(body, width=990))
+
+    # Setup the email
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    # Add the body to the email
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        # Create SMTP session for sending the mail
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        # server.starttls()  # Enable security
+        # server.login("","")  # Login with your email and password
+        text = msg.as_string()
+        server.sendmail(from_email, to_email, text)
+        server.quit()
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
 
 class Command(BaseCommand):
@@ -52,5 +90,16 @@ class Command(BaseCommand):
             print(f"{choice}: {votes} votes")
 
         # send the same results to the admin email
+        subject = f"Results for question: {question.question_text}"
+        body = "\n".join([f"{choice}: {votes} votes" for choice, votes in choices.items()])
+
+        now = datetime.now()
+        # add timestamp
+        body += f"\n\nTimestamp: {now}"
+
+        from_email = TECHNICAL_CONTACT_EMAIL
+        to_email = TECHNICAL_CONTACT_EMAIL
+
+        send_email(subject, body, from_email, to_email)
 
 
