@@ -82,7 +82,7 @@ input[type="submit"]:hover {
                                 {% for radio in field %}
 
                                     {% if radio.choice_label == 'ZZZ_USER_DEFINED' and question.enable_textfield_choice %}
-                                        <label>{{ radio.tag }}&nbsp;&nbsp;&nbsp;specifica la tua scelta: {{ form.text_choice }}</label><br><br>
+                                        <label>{{ radio.tag }}&nbsp;&nbsp;&nbsp;proponi un’altra denominazione di tuo gradimento: {{ form.text_choice }}</label><br><br>
                                     {% else %}
                                         <label>{{ radio.tag }}&nbsp;&nbsp;&nbsp;{{ radio.choice_label }}</label><br><br>
                                     {% endif %}
