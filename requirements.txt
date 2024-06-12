@@ -9,3 +9,4 @@ django-jinja
 django-bootstrap-v5
 django-environ
 user_agents
+requests
