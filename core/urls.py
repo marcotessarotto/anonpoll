@@ -11,4 +11,8 @@ urlpatterns = [
     path('<str:question_slug>/show-poll-question/', views.show_poll_question, name='show-poll-question'),
 
     path('<str:question_slug>/success_url/', views.success_url, name='success_url'),
+
+    path('<str:question_slug>/show-survey-question/', views.show_survey_question, name='show-survey-question'),
+
+    path('login/', views.subscriber_login, name='subscriber-login'),
 ]

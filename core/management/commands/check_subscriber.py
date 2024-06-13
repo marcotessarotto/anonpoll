@@ -25,8 +25,10 @@ class Command(BaseCommand):
             data = response.json()
             exists = data.get('exists', False)
             if exists:
+                subscriber = data.get('subscriber', {})
                 self.stdout.write(
                     self.style.SUCCESS(f'Subscriber with matricola {matricola} and email {email} exists.'))
+                self.stdout.write(f'Subscriber details: {subscriber}')
             else:
                 self.stdout.write(
                     self.style.WARNING(f'Subscriber with matricola {matricola} and email {email} does not exist.'))

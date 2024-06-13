@@ -3,6 +3,7 @@ import syslog
 from datetime import date
 
 import pytz
+import requests
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
@@ -10,9 +11,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT
+from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT, CHECK_SUBSCRIBER_WS_URL
 from anonpoll.view_tools import is_private_ip
-from .forms import VoteForm
+from .forms import VoteForm, SubscriberLoginForm
 from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser
 
 
@@ -202,3 +203,114 @@ def success_url(request, question_slug):
     }
 
     return render(request, 'core/thanks_poll_participation.html', context)
+
+__subscriber_dict = {}
+
+def show_survey_question(request, question_slug):
+    http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
+
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        # Check if the IP is private
+        if http_real_ip != '' and not is_private_ip(http_real_ip) and not DEBUG:
+            syslog.syslog(syslog.LOG_ERR, f'IP address {http_real_ip} is not private')
+            return render(request, 'core/show_generic_message.html',
+                          {'message': "403 Forbidden - accesso consentito solo da intranet"}, status=403)
+
+    # check request.session['subscriber_id'] and retrieve the subscriber instance
+    subscriber_id = request.session.get('subscriber_id')
+    if subscriber_id:
+        # subscriber = Subscriber.objects.get(id=subscriber_id)
+        pass
+    else:
+        # send email to admin
+        # redirect to login page
+        return redirect('subscriber-login')
+
+
+
+    return None
+
+
+
+def subscriber_login(request):
+    # get ip address from request META
+    http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
+
+    # Check if the IP is private
+    if http_real_ip != '' and not is_private_ip(http_real_ip) and not DEBUG:
+        syslog.syslog(syslog.LOG_ERR, f'IP address {http_real_ip} is not private')
+        return render(request, 'show_message.html', {'message': "403 Forbidden - accesso consentito solo da intranet"},
+                      status=403)
+
+    if request.method == 'POST':
+        form = SubscriberLoginForm(request.POST)
+        if form.is_valid():
+            matricola = form.cleaned_data['matricola']
+            email = form.cleaned_data['email']
+
+            params = {'matricola': matricola, 'email': email}
+
+            url = CHECK_SUBSCRIBER_WS_URL
+
+            try:
+                response = requests.get(url, params=params)
+                response.raise_for_status()  # Raise an exception for HTTP errors
+                data = response.json()
+                exists = data.get('exists', False)
+                if exists:
+                    subscriber = data.get('subscriber', {})
+
+                    create_event_log(
+                        event_type=EventLog.LOGIN_SUCCESS,
+                        event_title="Subscriber login success",
+                        event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip}",
+                    )
+
+                    # login(request, user, backend=AUTHENTICATION_BACKENDS[0])
+
+                    # Simulate login by saving subscriber's ID in session (example)
+                    request.session['subscriber_id'] = subscriber.id
+                    return redirect('manage-subscription')
+
+                else:
+                    self.stdout.write(
+                        self.style.WARNING(f'Subscriber with matricola {matricola} and email {email} does not exist.'))
+            except requests.RequestException as e:
+                self.stderr.write(self.style.ERROR(f'Error calling CheckSubscriberView: {e}'))
+
+            try:
+
+                subscriber = Subscriber.objects.get(matricola=matricola, email=email)
+
+                create_event_log(
+                    event_type=EventLog.LOGIN_SUCCESS,
+                    event_title="Subscriber login success",
+                    event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip}",
+                )
+
+                # login(request, user, backend=AUTHENTICATION_BACKENDS[0])
+
+                # Simulate login by saving subscriber's ID in session (example)
+                request.session['subscriber_id'] = subscriber.id
+                return redirect('manage-subscription')
+            except Subscriber.DoesNotExist:
+
+                create_event_log(
+                    event_type=EventLog.LOGIN_FAILED,
+                    event_title="Subscriber login failed",
+                    event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip}",
+                )
+
+                messages.error(request, 'errore: matricola o email non validi')
+
+    else:
+        form = SubscriberLoginForm()
+
+    context = {
+        'APPLICATION_TITLE': APPLICATION_TITLE,
+        'TECHNICAL_CONTACT_EMAIL': TECHNICAL_CONTACT_EMAIL,
+        'TECHNICAL_CONTACT': TECHNICAL_CONTACT,
+        'form': form,
+    }
+
+    return render(request, 'subscribers/login.html', context)

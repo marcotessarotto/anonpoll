@@ -57,3 +57,17 @@ class VoteForm(forms.Form):  # WithTextField
 
         return False
 
+
+class SubscriberLoginForm(forms.Form):
+
+    matricola = forms.CharField(
+        label='Matricola',
+        max_length=255,
+        widget=forms.TextInput(attrs={'size': '40'})  # Specify size for matricola field
+    )
+
+    email = forms.EmailField(
+        label='Email regionale',
+        widget=forms.EmailInput(attrs={'size': '40'})  # Here we specify the size
+    )
+
