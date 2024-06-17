@@ -15,7 +15,8 @@ from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT,
 from anonpoll.view_tools import is_private_ip
 from .forms import VoteForm, SubscriberLoginForm
 from .logic import create_event_log, create_subscriber_if_not_exits
-from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog
+from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, \
+    NamedSurvey
 
 
 def index(request):
@@ -241,6 +242,11 @@ def subscriber_login(request, question_slug):
         syslog.syslog(syslog.LOG_ERR, f'IP address {http_real_ip} is not private')
         return render(request, 'show_message.html', {'message': "403 Forbidden - accesso consentito solo da intranet"},
                       status=403)
+
+    # check existence of NamedSurvey instance with the given slug
+    named_survey = get_object_or_404(NamedSurvey, slug=question_slug)
+    if named_survey is None:
+        return render(request, 'show_message.html', {'message': "404 Not Found - survey non trovato"}, status=404)
 
     if request.method == 'POST':
         form = SubscriberLoginForm(request.POST)

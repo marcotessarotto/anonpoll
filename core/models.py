@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 class EventLog(models.Model):
@@ -178,3 +179,63 @@ def question_reset_votes(question):
 
     ChoiceSuggestedByUser.objects.filter(question=question).delete()
 
+
+
+#**********************
+
+class NamedSurvey(models.Model):
+    title = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name=_("Nome"))
+
+    description = models.TextField(blank=True, null=True)
+    start_date = models.DateTimeField(verbose_name="Poll start time", default=timezone.now)
+    end_date = models.DateTimeField(verbose_name="Poll end time", null=True, blank=True)
+
+    slug = models.SlugField(max_length=255, unique=True)
+    ref_token = models.UUIDField(default=uuid.uuid4)
+
+    privacy_policy = models.TextField(blank=True, null=True)
+
+    info_text = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+    def is_active(self):
+        from django.utils import timezone
+        now = timezone.now()
+        return self.start_date <= now <= self.end_date
+
+
+class NamedSurveyQuestion(models.Model):
+    QUESTION_TYPES = [
+        ('YNK', 'Yes/No/Do not know'),
+        ('TXT', 'Free text'),
+    ]
+
+    survey = models.ForeignKey(NamedSurvey, related_name='questions', on_delete=models.CASCADE)
+    text = models.CharField(max_length=1024)
+    question_type = models.CharField(max_length=3, choices=QUESTION_TYPES, default='YNK')
+
+    def __str__(self):
+        return f"{self.text} ({self.get_question_type_display()})"
+
+
+class NamedSurveyResponse(models.Model):
+    survey = models.ForeignKey(NamedSurvey, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Response on {self.created_at}"
+
+
+class NamedSurveyAnswer(models.Model):
+    response = models.ForeignKey(NamedSurveyResponse, related_name='answers', on_delete=models.CASCADE)
+    question = models.ForeignKey(NamedSurveyQuestion, on_delete=models.CASCADE)
+    text = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Answer to {self.question.text} - {self.text}"

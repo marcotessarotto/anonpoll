@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from .models import Question, Choice, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, Subscriber
+from .models import NamedSurvey, NamedSurveyQuestion, NamedSurveyResponse, NamedSurveyAnswer
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -12,7 +13,9 @@ class QuestionAdmin(admin.ModelAdmin):
     list_filter = ('start_time', 'end_time', 'created_at', 'updated_at')
     # Adding fieldsets for structured form layout
     fieldsets = (
-        (_('Question Information'), {'fields': ('name', 'question_text', 'slug', 'ref_token', 'privacy_policy','choices_are_sorted', 'enable_textfield_choice')}),
+        (_('Question Information'), {'fields': (
+        'name', 'question_text', 'slug', 'ref_token', 'privacy_policy', 'choices_are_sorted',
+        'enable_textfield_choice')}),
         (_('Timing'), {'fields': ('start_time', 'end_time')}),
         (_('Metadata'), {'fields': ('created_at', 'updated_at')}),
     )
@@ -53,8 +56,8 @@ admin.site.register(Choice, ChoiceAdmin)
 
 
 class ChoiceVoteAdmin(admin.ModelAdmin):
-    list_display = ('question', 'choice', )
-    list_filter = ('question', 'choice', )
+    list_display = ('question', 'choice',)
+    list_filter = ('question', 'choice',)
     search_fields = ('question__text', 'choice__choice_text',)
     ordering = ('-id',)
 
@@ -71,15 +74,15 @@ class ChoiceSuggestedByUserAdmin(admin.ModelAdmin):
     list_display = ('choice_text', 'question', 'votes')  # Fields to display in the admin list view
     list_filter = ('question',)  # Allow filtering by the question
     search_fields = (
-    'choice_text', 'question__text')  # Enable a search box that searches the choice text and related question text
+        'choice_text', 'question__text')  # Enable a search box that searches the choice text and related question text
 
 
 admin.site.register(ChoiceSuggestedByUser, ChoiceSuggestedByUserAdmin)
 
 
 class ChoiceVoteSuggestedByUserAdmin(admin.ModelAdmin):
-    list_display = ('question', 'choice', )  # Display these fields in the admin list view
-    list_filter = ('question', 'choice', )  # Enable filtering by these fields
+    list_display = ('question', 'choice',)  # Display these fields in the admin list view
+    list_filter = ('question', 'choice',)  # Enable filtering by these fields
     search_fields = ('question__text', 'choice__choice_text')  # Search by question text and choice text
     ordering = ('-id',)
 
@@ -99,3 +102,29 @@ class SubscriberAdmin(admin.ModelAdmin):
     list_filter = ('name', 'surname')
     search_fields = ('email', 'name', 'surname', 'matricola')
 
+
+@admin.register(NamedSurvey)
+class NamedSurveyAdmin(admin.ModelAdmin):
+    list_display = ('title', 'name', 'start_date', 'end_date', 'is_active')
+    search_fields = ('title', 'name')
+    prepopulated_fields = {'slug': ('title',)}
+
+
+@admin.register(NamedSurveyQuestion)
+class NamedSurveyQuestionAdmin(admin.ModelAdmin):
+    list_display = ('text', 'question_type', 'survey')
+    search_fields = ('text',)
+    list_filter = ('question_type', 'survey')
+
+
+@admin.register(NamedSurveyResponse)
+class NamedSurveyResponseAdmin(admin.ModelAdmin):
+    list_display = ('survey', 'created_at')
+    list_filter = ('survey', 'created_at')
+
+
+@admin.register(NamedSurveyAnswer)
+class NamedSurveyAnswerAdmin(admin.ModelAdmin):
+    list_display = ('response', 'question', 'text')
+    search_fields = ('text', 'question__text')
+    list_filter = ('response__survey', 'question')
