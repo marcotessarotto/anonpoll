@@ -220,6 +220,8 @@ class NamedSurveyQuestion(models.Model):
     text = models.CharField(max_length=1024)
     question_type = models.CharField(max_length=3, choices=QUESTION_TYPES, default='YNK')
 
+    mandatory = models.BooleanField(default=False)
+
     def __str__(self):
         return f"{self.text} ({self.get_question_type_display()})"
 

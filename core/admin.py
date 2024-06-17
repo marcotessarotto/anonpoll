@@ -112,7 +112,7 @@ class NamedSurveyAdmin(admin.ModelAdmin):
 
 @admin.register(NamedSurveyQuestion)
 class NamedSurveyQuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'question_type', 'survey')
+    list_display = ('text', 'question_type', 'mandatory', 'survey')
     search_fields = ('text',)
     list_filter = ('question_type', 'survey')
 
