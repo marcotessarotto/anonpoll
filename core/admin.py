@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import Question, Choice, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser
+from .models import Question, Choice, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, Subscriber
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -84,5 +84,18 @@ class ChoiceVoteSuggestedByUserAdmin(admin.ModelAdmin):
     ordering = ('-id',)
 
 
+@admin.register(EventLog)
+class EventLogAdmin(admin.ModelAdmin):
+    list_display = ('id', 'created_at', 'event_type', 'event_title', 'event_target', 'event_data', 'created_at')
+    list_filter = ['event_type']
+
+
 admin.site.register(ChoiceVoteSuggestedByUser, ChoiceVoteSuggestedByUserAdmin)
+
+
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'name', 'surname', 'matricola')
+    list_filter = ('name', 'surname')
+    search_fields = ('email', 'name', 'surname', 'matricola')
 

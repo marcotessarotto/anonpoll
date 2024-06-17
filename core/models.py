@@ -4,6 +4,72 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+class EventLog(models.Model):
+    """
+    Represents an event log entry.
+
+    Args:
+        event_type (str): The type of the event.
+        event_title (str): The title of the event.
+        event_data (str): The data associated with the event.
+        event_target (str, optional): The target of the event.
+
+    Returns:
+        str: A string representation of the EventLog.
+
+    Examples:
+        >>> event = EventLog(event_type="LOGIN", event_title="User Login", event_data="User 'john' logged in successfully")
+        >>> print(event)
+        EventLog #1  event_type=LOGIN event_target=None event_title=User Login 2022-01-01 12:00:00
+    """
+    ERROR_SENDING_EMAIL = "ERROR_SENDING_EMAIL"
+    EMAIL_SENT = "EMAIL_SENT"
+    SUBSCRIPTION_SET = "SUBSCRIPTION_SET"
+    SUBSCRIPTION_REMOVED = "SUBSCRIPTION_REMOVED"
+    LOGIN = "LOGIN"
+    LOGIN_FAILED = "LOGIN_FAILED"
+    LOGIN_SUCCESS = "LOGIN_SUCCESS"
+    LOGIN_SUCCESS_JSON = "LOGIN_SUCCESS_JSON"
+    LOGIN_FAILED_JSON = "LOGIN_FAILED_JSON"
+    REMAINDER_EMAIL_SENT = "REMAINDER_EMAIL_SENT"
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    event_type = models.CharField(max_length=128, null=True)
+    event_title = models.CharField(max_length=256, null=True)
+    event_data = models.TextField(null=True)
+    event_target = models.CharField(max_length=256, null=True, blank=True)
+
+    def __str__(self):
+        return f"EventLog #{self.id}  event_type={self.event_type} event_target={self.event_target} event_title={self.event_title} {self.created_at}"
+
+
+class Subscriber(models.Model):
+    """
+    Model for Subscriber, representing a subscriber with email, name, surname, and matricola.
+
+    Attributes:
+        email (str): The email of the subscriber.
+        name (str): The name of the subscriber.
+        surname (str): The surname of the subscriber.
+        matricola (str): The matricola of the subscriber.
+
+    Methods:
+        __str__(): Returns a string representation of the Subscriber instance.
+    """
+    email = models.EmailField(verbose_name=_("Email"), max_length=255)
+    name = models.CharField(verbose_name=_("Nome"), max_length=255)
+    surname = models.CharField(verbose_name=_("Cognome"), max_length=255)
+    matricola = models.CharField(verbose_name=_("Matricola"), max_length=255)
+
+    def __str__(self):
+        return f"{self.name} {self.surname}"
+
+    class Meta:
+        verbose_name = _("Subscriber")
+        verbose_name_plural = _("Subscribers")
+
+
 class Question(models.Model):
     name = models.CharField(max_length=255, verbose_name=_("Nome"))
 

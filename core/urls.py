@@ -14,5 +14,10 @@ urlpatterns = [
 
     path('<str:question_slug>/show-survey-question/', views.show_survey_question, name='show-survey-question'),
 
-    path('login/', views.subscriber_login, name='subscriber-login'),
+    # survey which requires authentication to post
+
+    path('<str:question_slug>/login/', views.subscriber_login, name='subscriber-login'),
+
+    path('<str:question_slug>/post-authenticated-survey/', views.post_authenticated_survey, name='post-authenticated-survey'),
+
 ]

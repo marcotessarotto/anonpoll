@@ -4,21 +4,22 @@ from datetime import date
 
 import pytz
 import requests
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-
 from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT, CHECK_SUBSCRIBER_WS_URL
 from anonpoll.view_tools import is_private_ip
 from .forms import VoteForm, SubscriberLoginForm
-from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser
+from .logic import create_event_log, create_subscriber_if_not_exits
+from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog
 
 
 def index(request):
-    latest_question_list = Question.objects.all() # order_by('-pub_date')[:5]
+    latest_question_list = Question.objects.all()  # order_by('-pub_date')[:5]
     context = {'latest_question_list': latest_question_list}
     return render(request, 'core/index.html', context)
 
@@ -147,7 +148,8 @@ def show_poll_question(request, question_slug):
                 return response
             else:
                 # Handle the case where privacy policy is not accepted
-                form.add_error('accept_privacy_policy', _('You must accept the privacy policy to participate to the poll.'))
+                form.add_error('accept_privacy_policy',
+                               _('You must accept the privacy policy to participate to the poll.'))
     else:
         form = VoteForm(question=question)
 
@@ -161,7 +163,6 @@ def show_poll_question(request, question_slug):
 
 
 def success_url(request, question_slug):
-
     http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
 
     if not request.user.is_authenticated or not request.user.is_superuser:
@@ -204,7 +205,9 @@ def success_url(request, question_slug):
 
     return render(request, 'core/thanks_poll_participation.html', context)
 
+
 __subscriber_dict = {}
+
 
 def show_survey_question(request, question_slug):
     http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
@@ -226,13 +229,10 @@ def show_survey_question(request, question_slug):
         # redirect to login page
         return redirect('subscriber-login')
 
-
-
     return None
 
 
-
-def subscriber_login(request):
+def subscriber_login(request, question_slug):
     # get ip address from request META
     http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
 
@@ -266,39 +266,41 @@ def subscriber_login(request):
                         event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip}",
                     )
 
+                    subscriber = create_subscriber_if_not_exits(
+                        email=subscriber.get('email', ''),
+                        name=subscriber.get('name', ''),
+                        surname=subscriber.get('surname', ''),
+                        matricola=subscriber.get('matricola', ''),
+                    )
+
                     # login(request, user, backend=AUTHENTICATION_BACKENDS[0])
 
                     # Simulate login by saving subscriber's ID in session (example)
                     request.session['subscriber_id'] = subscriber.id
-                    return redirect('manage-subscription')
+                    request.session['question_slug'] = question_slug
+
+                    # Reverse the URL with the slug parameter
+                    url = reverse('post-authenticated-survey', kwargs={'question_slug': question_slug})
+
+                    return redirect(url)
 
                 else:
-                    self.stdout.write(
-                        self.style.WARNING(f'Subscriber with matricola {matricola} and email {email} does not exist.'))
+
+                    create_event_log(
+                        event_type=EventLog.LOGIN_FAILED,
+                        event_title="Subscriber login failed",
+                        event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip}",
+                    )
+
+                    messages.error(request, 'errore: matricola o email non validi')
+
             except requests.RequestException as e:
-                self.stderr.write(self.style.ERROR(f'Error calling CheckSubscriberView: {e}'))
-
-            try:
-
-                subscriber = Subscriber.objects.get(matricola=matricola, email=email)
-
-                create_event_log(
-                    event_type=EventLog.LOGIN_SUCCESS,
-                    event_title="Subscriber login success",
-                    event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip}",
-                )
-
-                # login(request, user, backend=AUTHENTICATION_BACKENDS[0])
-
-                # Simulate login by saving subscriber's ID in session (example)
-                request.session['subscriber_id'] = subscriber.id
-                return redirect('manage-subscription')
-            except Subscriber.DoesNotExist:
+                # self.stderr.write(self.style.ERROR(f'Error calling CheckSubscriberView: {e}'))
 
                 create_event_log(
                     event_type=EventLog.LOGIN_FAILED,
                     event_title="Subscriber login failed",
-                    event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip}",
+                    event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip} error: {e}",
                 )
 
                 messages.error(request, 'errore: matricola o email non validi')
@@ -307,10 +309,24 @@ def subscriber_login(request):
         form = SubscriberLoginForm()
 
     context = {
-        'APPLICATION_TITLE': APPLICATION_TITLE,
+        'APPLICATION_TITLE': '-',
         'TECHNICAL_CONTACT_EMAIL': TECHNICAL_CONTACT_EMAIL,
         'TECHNICAL_CONTACT': TECHNICAL_CONTACT,
         'form': form,
     }
 
     return render(request, 'subscribers/login.html', context)
+
+
+def post_authenticated_survey(request, question_slug):
+    # get ip address from request META
+    http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
+
+    # Check if the IP is private
+    if http_real_ip != '' and not is_private_ip(http_real_ip) and not DEBUG:
+        syslog.syslog(syslog.LOG_ERR, f'IP address {http_real_ip} is not private')
+        return render(request, 'show_message.html', {'message': "403 Forbidden - accesso consentito solo da intranet"},
+                      status=403)
+
+
+    return None
