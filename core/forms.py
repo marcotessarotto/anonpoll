@@ -1,6 +1,7 @@
 from django import forms
-from .models import Choice
+from .models import Choice, NamedSurveyAnswer
 from django.utils.translation import gettext_lazy as _
+from .models import NamedSurveyQuestion
 
 # class VoteFormV1(forms.Form):
 #     choice = forms.ModelChoiceField(queryset=None, widget=forms.RadioSelect, empty_label=None)
@@ -70,4 +71,41 @@ class SubscriberLoginForm(forms.Form):
         label='Email regionale',
         widget=forms.EmailInput(attrs={'size': '40'})  # Here we specify the size
     )
+
+#****************
+
+
+class NamedSurveyAnswerForm(forms.ModelForm):
+    class Meta:
+        model = NamedSurveyAnswer
+        fields = ['text']
+
+
+TEXT_AREA_COLUMNS = 60
+TEXT_AREA_ROWS = 4
+
+
+def make_named_survey_form(survey):
+    class PollForm(forms.Form):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            questions = NamedSurveyQuestion.objects.filter(survey=survey)
+            for question in questions:
+                field_name = f"question_{question.id}"
+                if question.question_type == 'YNK':
+                    choices = [('do_not_know', 'Do not know'), ('yes', 'Yes'), ('no', 'No')]
+                    self.fields[field_name] = forms.ChoiceField(
+                        choices=choices,
+                        label=question.text,
+                        widget=forms.Select,  # Changed from RadioSelect to Select
+                        initial='do_not_know'
+                    )
+                elif question.question_type == 'TXT':
+                    self.fields[field_name] = forms.CharField(
+                        label=question.text,
+                        widget=forms.Textarea(attrs={'rows': 4}),
+                        required=False
+                    )
+
+    return PollForm
 

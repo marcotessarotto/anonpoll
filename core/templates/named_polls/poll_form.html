@@ -1,0 +1,66 @@
+{% extends "named_polls/named_polls_master.html" %}
+{% load tz %}
+{% block title %}Webinar survey{% endblock %}
+{% block blue_title %}Webinar survey{% endblock %}
+
+{% block content %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <table width="100%" class="table">
+
+            <tr>
+                <td colspan="2" align="center">
+                    <h1>{{ poll.title }}</h1>
+                </td>
+            </tr>
+
+            {% for field in form %}
+              {% if field.name == "answers" %}
+              {% else %}
+
+              <tr>
+                  <!-- field.label_tag -->
+                <th width="30%"> <label for="{{ field.id_for_label }}">{{ field.label|safe }}</label> </th>
+                <td width="70%">{{ field }}
+                  <!-- Display field-specific errors here -->
+                  {% if field.errors %}
+                    <div class="alert alert-danger">
+                      {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endif %}
+            {% endfor %}
+
+            {% if poll.info_text %}
+            <tr>
+                <td colspan="2" align="center">
+                    {{ poll.info_text|safe }}
+                </td>
+            </tr>
+
+            {% endif %}
+
+            <tr>
+                <td colspan="2" align="center">
+                    <button type="submit" class="btn btn-lg btn-primary large-button" >Send Your Response</button>
+                </td>
+            </tr>
+
+        </table>
+
+
+
+    </form>
+
+
+{% endblock %}
+
+
+
+

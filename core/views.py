@@ -13,10 +13,10 @@ from django.utils.translation import gettext_lazy as _
 
 from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT, CHECK_SUBSCRIBER_WS_URL
 from anonpoll.view_tools import is_private_ip
-from .forms import VoteForm, SubscriberLoginForm
+from .forms import VoteForm, SubscriberLoginForm, make_named_survey_form
 from .logic import create_event_log, create_subscriber_if_not_exits
 from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, \
-    NamedSurvey
+    NamedSurvey, NamedSurveyResponse, NamedSurveyQuestion, NamedSurveyAnswer
 
 
 def index(request):
@@ -326,6 +326,7 @@ def subscriber_login(request, question_slug):
 
 
 def post_authenticated_survey(request, question_slug):
+
     # get ip address from request META
     http_real_ip = request.META.get('HTTP_X_REAL_IP', '')
 
@@ -335,5 +336,25 @@ def post_authenticated_survey(request, question_slug):
         return render(request, 'show_message.html', {'message': "403 Forbidden - accesso consentito solo da intranet"},
                       status=403)
 
+    survey = get_object_or_404(NamedSurvey, slug=question_slug)
+    if not survey.is_active():
+        return HttpResponse("This named survey is not currently active.", status=403)
 
-    return None
+    PollForm = make_named_survey_form(survey)
+    if request.method == 'POST':
+        form = PollForm(request.POST)
+        if form.is_valid():
+            response = NamedSurveyResponse(survey=survey)
+            response.save()
+            for field in form.cleaned_data:
+                question_id = field.split('_')[1]
+                question = get_object_or_404(NamedSurveyQuestion, id=question_id)
+                text = form.cleaned_data[field]
+                NamedSurveyAnswer.objects.create(response=response, question=question, text=text)
+
+            success_url = reverse('success_url', args=(survey.slug,))
+            return redirect(success_url)
+    else:
+        form = PollForm()
+
+    return render(request, 'named_polls/poll_form.html', {'form': form, 'survey': survey})
