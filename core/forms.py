@@ -1,5 +1,5 @@
 from django import forms
-from .models import Choice, NamedSurveyAnswer
+from .models import Choice, NamedSurveyAnswer, NamedSurveyQuestionOption
 from django.utils.translation import gettext_lazy as _
 from .models import NamedSurveyQuestion
 
@@ -85,27 +85,73 @@ TEXT_AREA_COLUMNS = 60
 TEXT_AREA_ROWS = 4
 
 
+# def make_named_survey_form(survey):
+#     class PollForm(forms.Form):
+#         def __init__(self, *args, **kwargs):
+#             super().__init__(*args, **kwargs)
+#             questions = NamedSurveyQuestion.objects.filter(survey=survey)
+#             for question in questions:
+#                 field_name = f"question_{question.id}"
+#                 if question.question_type == 'YNK':
+#                     choices = [('do_not_know', 'Do not know'), ('yes', 'Yes'), ('no', 'No')]
+#                     self.fields[field_name] = forms.ChoiceField(
+#                         choices=choices,
+#                         label=question.text,
+#                         widget=forms.Select,  # Changed from RadioSelect to Select
+#                         initial='do_not_know'
+#                     )
+#                 elif question.question_type == 'TXT':
+#                     self.fields[field_name] = forms.CharField(
+#                         label=question.text,
+#                         widget=forms.Textarea(attrs={'rows': 4}),
+#                         required=False
+#                     )
+#
+#     return PollForm
+
+
 def make_named_survey_form(survey):
-    class PollForm(forms.Form):
+    class NamedSurveyForm(forms.Form):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             questions = NamedSurveyQuestion.objects.filter(survey=survey)
             for question in questions:
                 field_name = f"question_{question.id}"
+                # Get the required status from the 'mandatory' attribute of the question
+                required_status = question.mandatory
+
                 if question.question_type == 'YNK':
-                    choices = [('do_not_know', 'Do not know'), ('yes', 'Yes'), ('no', 'No')]
+                    choices = [('do_not_know', 'Non lo so'), ('yes', 'Sì'), ('no', 'No')]
                     self.fields[field_name] = forms.ChoiceField(
                         choices=choices,
                         label=question.text,
-                        widget=forms.Select,  # Changed from RadioSelect to Select
-                        initial='do_not_know'
+                        widget=forms.Select,
+                        initial='do_not_know',
+                        required=required_status  # Set the required status based on the question's mandatory attribute
+                    )
+                elif question.question_type == 'YN':
+                    choices = [('yes', 'Sì'), ('no', 'No')]
+                    self.fields[field_name] = forms.ChoiceField(
+                        choices=choices,
+                        label=question.text,
+                        widget=forms.Select,
+                        required=required_status  # Apply the mandatory attribute
                     )
                 elif question.question_type == 'TXT':
                     self.fields[field_name] = forms.CharField(
                         label=question.text,
                         widget=forms.Textarea(attrs={'rows': 4}),
-                        required=False
+                        required=required_status  # Apply the mandatory attribute
+                    )
+                elif question.question_type == 'MCQ':
+                    # Fetch the options related to the current question
+                    options = NamedSurveyQuestionOption.objects.filter(question=question)
+                    choices = [(option.id, option.option_text) for option in options]
+                    self.fields[field_name] = forms.ChoiceField(
+                        choices=choices,
+                        label=question.text,
+                        widget=forms.Select,
+                        required=required_status  # Apply the mandatory attribute
                     )
 
-    return PollForm
-
+    return NamedSurveyForm

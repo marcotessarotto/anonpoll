@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import Question, Choice, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, Subscriber
+from .models import Question, Choice, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, \
+    Subscriber, NamedSurveyQuestionOption
 from .models import NamedSurvey, NamedSurveyQuestion, NamedSurveyResponse, NamedSurveyAnswer
 
 
@@ -14,8 +15,8 @@ class QuestionAdmin(admin.ModelAdmin):
     # Adding fieldsets for structured form layout
     fieldsets = (
         (_('Question Information'), {'fields': (
-        'name', 'question_text', 'slug', 'ref_token', 'privacy_policy', 'choices_are_sorted',
-        'enable_textfield_choice')}),
+            'name', 'question_text', 'slug', 'ref_token', 'privacy_policy', 'choices_are_sorted',
+            'enable_textfield_choice')}),
         (_('Timing'), {'fields': ('start_time', 'end_time')}),
         (_('Metadata'), {'fields': ('created_at', 'updated_at')}),
     )
@@ -103,6 +104,11 @@ class SubscriberAdmin(admin.ModelAdmin):
     search_fields = ('email', 'name', 'surname', 'matricola')
 
 
+class NamedSurveyQuestionOptionInline(admin.TabularInline):
+    model = NamedSurveyQuestionOption
+    extra = 1
+
+
 @admin.register(NamedSurvey)
 class NamedSurveyAdmin(admin.ModelAdmin):
     list_display = ('title', 'name', 'start_date', 'end_date', 'is_active')
@@ -112,9 +118,9 @@ class NamedSurveyAdmin(admin.ModelAdmin):
 
 @admin.register(NamedSurveyQuestion)
 class NamedSurveyQuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'question_type', 'mandatory', 'survey')
-    search_fields = ('text',)
+    list_display = ('text', 'question_type', 'survey')
     list_filter = ('question_type', 'survey')
+    inlines = [NamedSurveyQuestionOptionInline]
 
 
 @admin.register(NamedSurveyResponse)

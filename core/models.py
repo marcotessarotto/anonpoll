@@ -77,7 +77,7 @@ class Question(models.Model):
     question_text = models.TextField(max_length=2000)
 
     start_time = models.DateTimeField('start time')  # Poll start time
-    end_time = models.DateTimeField('end time')      # Poll end time
+    end_time = models.DateTimeField('end time')  # Poll end time
 
     slug = models.SlugField(max_length=255, unique=True)
     ref_token = models.UUIDField(default=uuid.uuid4)
@@ -150,6 +150,7 @@ class Choice(models.Model):
 class ChoiceVote(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
+
     # voted_at = models.DateField(null=False, blank=False)
 
     class Meta:
@@ -161,6 +162,7 @@ class ChoiceVote(models.Model):
 class ChoiceVoteSuggestedByUser(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice = models.ForeignKey(ChoiceSuggestedByUser, on_delete=models.CASCADE)
+
     # voted_at = models.DateField(null=False, blank=False)
 
     class Meta:
@@ -178,7 +180,6 @@ def question_reset_votes(question):
     ChoiceVoteSuggestedByUser.objects.filter(question=question).delete()
 
     ChoiceSuggestedByUser.objects.filter(question=question).delete()
-
 
 
 #**********************
@@ -212,18 +213,27 @@ class NamedSurvey(models.Model):
 
 class NamedSurveyQuestion(models.Model):
     QUESTION_TYPES = [
-        ('YNK', 'Yes/No/Do not know'),
-        ('TXT', 'Free text'),
+        ('YNK', 'Sì/No/Non so'),
+        ('TXT', 'Testo'),
+        ('MCQ', 'Domanda a scelta multipla'),
+        ('YN', 'Sì/No'),
     ]
 
     survey = models.ForeignKey(NamedSurvey, related_name='questions', on_delete=models.CASCADE)
     text = models.CharField(max_length=1024)
     question_type = models.CharField(max_length=3, choices=QUESTION_TYPES, default='YNK')
-
     mandatory = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.text} ({self.get_question_type_display()})"
+
+
+class NamedSurveyQuestionOption(models.Model):
+    question = models.ForeignKey(NamedSurveyQuestion, related_name='options', on_delete=models.CASCADE)
+    option_text = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.option_text}"
 
 
 class NamedSurveyResponse(models.Model):
