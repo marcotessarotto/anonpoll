@@ -340,6 +340,12 @@ def post_authenticated_survey(request, question_slug):
     if not survey.is_active():
         return HttpResponse("This named survey is not currently active.", status=403)
 
+    # check http session for subscriber_id
+    subscriber_id = request.session.get('subscriber_id')
+    if subscriber_id is None:
+        url = reverse('core:subscriber-login', kwargs={'question_slug': question_slug})
+        return redirect(url)
+
     PollForm = make_named_survey_form(survey)
     if request.method == 'POST':
         form = PollForm(request.POST)
