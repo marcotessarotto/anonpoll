@@ -280,7 +280,7 @@ def subscriber_login(request, question_slug):
                     request.session['question_slug'] = question_slug
 
                     # Reverse the URL with the slug parameter
-                    url = reverse('post-authenticated-survey', kwargs={'question_slug': question_slug})
+                    url = reverse('core:post-authenticated-survey', kwargs={'question_slug': question_slug})
 
                     return redirect(url)
 
@@ -313,6 +313,7 @@ def subscriber_login(request, question_slug):
         'TECHNICAL_CONTACT_EMAIL': TECHNICAL_CONTACT_EMAIL,
         'TECHNICAL_CONTACT': TECHNICAL_CONTACT,
         'form': form,
+        # 'question_slug': question_slug,
     }
 
     return render(request, 'subscribers/login.html', context)
