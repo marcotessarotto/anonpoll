@@ -1,7 +1,7 @@
 {% extends "named_polls/named_polls_master.html" %}
 {% load static i18n %}
 
-{% block title %}Thank you for your participation to the survey.{% endblock %}
+{% block title %}Grazie per il tuo contributo{% endblock %}
 {% block blue_title %}Webinar survey{% endblock %}
 {% block logo_title %}Webinar survey{% endblock %}
 
@@ -64,7 +64,7 @@ input[type="submit"]:hover {
             <div class="card-body">
                 <br>
 
-                <h1>Grazie per il tuo contributo</h1>
+                <h1>{{ message_body|safe }}</h1>
                 <br>
 
 

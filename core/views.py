@@ -372,11 +372,11 @@ def post_authenticated_survey(request, question_slug):
             # get Subscriber istance using subscriber_id
             subscriber = get_object_or_404(Subscriber, id=subscriber_id)
 
-            message_subject = f'{SUBJECT_EMAIL} Riepilogo delle tue risposte al sondaggio "{survey.title}"'
-            message_body = f'Ciao {subscriber.name},\n\n'
-            message_body += f'grazie per aver partecipato alla nostra indagine.\n\n'
-            message_body += 'Ecco un riepilogo delle tue risposte:\n\n'
-            message_body += '\n'.join(summary)
+            message_subject = f'Riepilogo delle tue risposte al sondaggio "{survey.title}"'
+            message_body = f'Ciao {subscriber.name},<br><br>'
+            message_body += f'grazie per aver partecipato alla nostra indagine.<br><br>'
+            message_body += 'Ecco un riepilogo delle tue risposte:<br><br>'
+            message_body += '<br>'.join(summary)
 
             # add data to the http session
             request.session['survey_summary'] = summary
@@ -414,11 +414,13 @@ def post_authenticated_survey(request, question_slug):
 
 
 def authenticated_survey_successl_url(request, question_slug):
+    message_body = request.session.get('message_body')
 
     context = {
         'APPLICATION_TITLE': '-',
         'TECHNICAL_CONTACT_EMAIL': TECHNICAL_CONTACT_EMAIL,
         'TECHNICAL_CONTACT': TECHNICAL_CONTACT,
+        'message_body': message_body,
         # 'form': form,
         # 'question_slug': question_slug,
     }
