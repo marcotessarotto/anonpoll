@@ -16,7 +16,7 @@ def export_named_survey_answers_to_excel(modeladmin, request, queryset):
     ws.title = "Survey Answers"
 
     # Define the header
-    columns = ['Survey Title', 'Question', 'Answer', 'Subscriber Email', 'Subscriber Name', 'Subscriber Surname']
+    columns = ['Survey Title', 'Question', 'Answer', 'Subscriber Email', 'Subscriber Name', 'Subscriber Surname', 'Subscriber UAF', 'Subscriber structure']
     ws.append(columns)
 
     # Append data rows
@@ -28,7 +28,9 @@ def export_named_survey_answers_to_excel(modeladmin, request, queryset):
             answer.text or "No Answer",
             subscriber.email if subscriber else "No Subscriber",
             subscriber.name if subscriber else "No Name",
-            subscriber.surname if subscriber else "No Surname"
+            subscriber.surname if subscriber else "No Surname",
+            subscriber.uaf if subscriber else "No UAF",
+            subscriber.structure if subscriber else "No Structure",
         ]
         ws.append(row)
 
@@ -173,7 +175,18 @@ class NamedSurveyResponseAdmin(admin.ModelAdmin):
 
 @admin.register(NamedSurveyAnswer)
 class NamedSurveyAnswerAdmin(admin.ModelAdmin):
-    list_display = ('response', 'question', 'text')
-    search_fields = ('text', 'question__text')
-    list_filter = ('response__survey', 'question')
-    actions = [export_named_survey_answers_to_excel]  #
+    list_display = ('response', 'survey_title', 'survey_id', 'question',)
+    search_fields = ('text', 'question__text', 'response__survey__title')
+    list_filter = ('response__survey__title', 'response__survey', 'question')
+
+    actions = [export_named_survey_answers_to_excel]  # Assuming this action is already defined
+
+    def survey_title(self, obj):
+        return obj.response.survey.title
+    survey_title.admin_order_field = 'response__survey__title'  # Allows column order sorting
+    survey_title.short_description = 'Survey Title'  # Column header
+
+    def survey_id(self, obj):
+        return obj.response.survey.id
+    survey_id.admin_order_field = 'response__survey__id'  # Allows column order sorting
+    survey_id.short_description = 'Survey ID'  # Column header
