@@ -11,12 +11,14 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT, CHECK_SUBSCRIBER_WS_URL
+from anonpoll.email_utils import my_send_email
+from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT, CHECK_SUBSCRIBER_WS_URL, SUBJECT_EMAIL, \
+    FROM_EMAIL, DEBUG_EMAIL, EMAIL_HOST
 from anonpoll.view_tools import is_private_ip
 from .forms import VoteForm, SubscriberLoginForm, make_named_survey_form
 from .logic import create_event_log, create_subscriber_if_not_exits
 from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, \
-    NamedSurvey, NamedSurveyResponse, NamedSurveyQuestion, NamedSurveyAnswer
+    NamedSurvey, NamedSurveyResponse, NamedSurveyQuestion, NamedSurveyAnswer, Subscriber
 
 
 def index(request):
@@ -358,9 +360,67 @@ def post_authenticated_survey(request, question_slug):
                 text = form.cleaned_data[field]
                 NamedSurveyAnswer.objects.create(response=response, question=question, text=text)
 
-            success_url = reverse('success_url', args=(survey.slug,))
+            # prepare a summary of the submitted data by user
+            summary = []
+            for field in form.cleaned_data:
+                question_id = field.split('_')[1]
+                question = get_object_or_404(NamedSurveyQuestion, id=question_id)
+                text = form.cleaned_data[field]
+                summary.append(f"{question.text}: {text}")
+
+            # send an email to the user with the summary
+            # get Subscriber istance using subscriber_id
+            subscriber = get_object_or_404(Subscriber, id=subscriber_id)
+
+            message_subject = f'{SUBJECT_EMAIL} Riepilogo delle tue risposte al sondaggio "{survey.title}"'
+            message_body = f'Ciao {subscriber.name},\n\n'
+            message_body += f'grazie per aver partecipato alla nostra indagine.\n\n'
+            message_body += 'Ecco un riepilogo delle tue risposte:\n\n'
+            message_body += '\n'.join(summary)
+
+            # add data to the http session
+            request.session['survey_summary'] = summary
+            request.session['survey_id'] = survey.id
+            request.session['message_body'] = message_body
+            request.session['message_subject'] = message_subject
+
+            if DEBUG:
+                print(f"debug mode: fake sending email to {subscriber.email}")
+                print(f"message: {message_body}  (debug mode)")
+            else:
+                my_send_email(
+                    FROM_EMAIL,
+                    [subscriber.email],
+                    message_subject,
+                    message_body,
+                    bcc_addresses=[DEBUG_EMAIL],
+                    attachments=None,
+                    email_host=EMAIL_HOST
+                )
+
+            create_event_log(
+                event_type=EventLog.EMAIL_SENT,
+                event_title=message_subject,
+                event_data=f"subscriber: {subscriber} email: {subscriber.email} {message_body}",
+                event_target=subscriber.email,
+            )
+
+            success_url = reverse('core:authenticated-survey-success-url', args=(survey.slug,))
             return redirect(success_url)
     else:
         form = PollForm()
 
     return render(request, 'named_polls/poll_form.html', {'form': form, 'survey': survey})
+
+
+def authenticated_survey_successl_url(request, question_slug):
+
+    context = {
+        'APPLICATION_TITLE': '-',
+        'TECHNICAL_CONTACT_EMAIL': TECHNICAL_CONTACT_EMAIL,
+        'TECHNICAL_CONTACT': TECHNICAL_CONTACT,
+        # 'form': form,
+        # 'question_slug': question_slug,
+    }
+
+    return render(request, 'named_polls/thanks_poll_participation.html', context)

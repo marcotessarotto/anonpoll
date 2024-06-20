@@ -130,7 +130,7 @@ def make_named_survey_form(survey):
                         required=required_status  # Set the required status based on the question's mandatory attribute
                     )
                 elif question.question_type == 'YN':
-                    choices = [('yes', 'Sì'), ('no', 'No')]
+                    choices = [('Sì', 'Sì'), ('No', 'No')]
                     self.fields[field_name] = forms.ChoiceField(
                         choices=choices,
                         label=question.text,
@@ -146,7 +146,7 @@ def make_named_survey_form(survey):
                 elif question.question_type == 'MCQ':
                     # Fetch the options related to the current question
                     options = NamedSurveyQuestionOption.objects.filter(question=question)
-                    choices = [(option.id, option.option_text) for option in options]
+                    choices = [(option.option_text, option.option_text) for option in options]
                     self.fields[field_name] = forms.ChoiceField(
                         choices=choices,
                         label=question.text,

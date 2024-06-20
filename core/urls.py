@@ -20,4 +20,6 @@ urlpatterns = [
 
     path('<str:question_slug>/post-authenticated-survey/', views.post_authenticated_survey, name='post-authenticated-survey'),
 
+    path('<str:question_slug>/authenticated-survey-success-url/', views.authenticated_survey_successl_url, name='authenticated-survey-success-url'),
+
 ]
