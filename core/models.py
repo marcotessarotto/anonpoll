@@ -63,6 +63,9 @@ class Subscriber(models.Model):
     surname = models.CharField(verbose_name=_("Cognome"), max_length=255)
     matricola = models.CharField(verbose_name=_("Matricola"), max_length=255)
 
+    uaf = models.CharField(verbose_name=_("UAF"), max_length=255, null=True, blank=True)
+    structure = models.CharField(verbose_name=_("Struttura"), max_length=1024, null=True, blank=True)
+
     def __str__(self):
         return f"{self.name} {self.surname}"
 

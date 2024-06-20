@@ -22,4 +22,6 @@ urlpatterns = [
 
     path('<str:question_slug>/authenticated-survey-success-url/', views.authenticated_survey_successl_url, name='authenticated-survey-success-url'),
 
+    path('<str:question_slug>/logout/', views.subscriber_logout, name='subscriber-logout'),
+
 ]

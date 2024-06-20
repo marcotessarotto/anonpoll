@@ -48,7 +48,7 @@ def create_subscriber(email, name, surname, matricola):
     return subscriber
 
 
-def create_subscriber_if_not_exits(email, name, surname, matricola):
+def create_subscriber_if_not_exits(email, name, surname, matricola, uaf, structure):
     """
     Creates a new Subscriber instance and saves it to the database if it does not already exist.
 
@@ -61,6 +61,6 @@ def create_subscriber_if_not_exits(email, name, surname, matricola):
     Returns:
     - subscriber (Subscriber): The newly created or existing Subscriber instance.
     """
-    subscriber, created = Subscriber.objects.get_or_create(email=email, name=name, surname=surname, matricola=matricola)
+    subscriber, created = Subscriber.objects.get_or_create(email=email, name=name, surname=surname, matricola=matricola, uaf=uaf, structure=structure)
     return subscriber
 

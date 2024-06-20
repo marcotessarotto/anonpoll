@@ -279,6 +279,8 @@ def subscriber_login(request, question_slug):
                         name=subscriber.get('name', ''),
                         surname=subscriber.get('surname', ''),
                         matricola=subscriber.get('matricola', ''),
+                        uaf=subscriber.get('uaf', ''),
+                        structure=subscriber.get('structure', ''),
                     )
 
                     # login(request, user, backend=AUTHENTICATION_BACKENDS[0])
@@ -349,7 +351,18 @@ def post_authenticated_survey(request, question_slug):
         return redirect(url)
 
     # get subscriber instance using subscriber_id
-    subscriber = get_object_or_404(Subscriber, id=subscriber_id)
+
+    try:
+        subscriber = Subscriber.objects.get(id=subscriber_id)
+    except Subscriber.DoesNotExist:
+        # reset http session
+        del request.session['subscriber_id']
+        return render(request, 'show_message.html', {'message': "404 Not Found - subscriber non trovato"}, status=404)
+
+
+    if subscriber is None:
+        return render(request, 'show_message.html', {'message': "404 Not Found - subscriber non trovato"}, status=404)
+
 
     PollForm = make_named_survey_form(survey)
     if request.method == 'POST':
@@ -429,3 +442,12 @@ def authenticated_survey_successl_url(request, question_slug):
     }
 
     return render(request, 'named_polls/thanks_poll_participation.html', context)
+
+
+def subscriber_logout(request, question_slug):
+    # remove subscriber_id from session
+    if 'subscriber_id' in request.session:
+        del request.session['subscriber_id']
+
+    url = reverse('core:subscriber-login', kwargs={'question_slug': question_slug})
+    return redirect(url)
