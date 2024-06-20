@@ -348,11 +348,14 @@ def post_authenticated_survey(request, question_slug):
         url = reverse('core:subscriber-login', kwargs={'question_slug': question_slug})
         return redirect(url)
 
+    # get subscriber instance using subscriber_id
+    subscriber = get_object_or_404(Subscriber, id=subscriber_id)
+
     PollForm = make_named_survey_form(survey)
     if request.method == 'POST':
         form = PollForm(request.POST)
         if form.is_valid():
-            response = NamedSurveyResponse(survey=survey)
+            response = NamedSurveyResponse(survey=survey, subscriber=subscriber)
             response.save()
             for field in form.cleaned_data:
                 question_id = field.split('_')[1]
@@ -376,7 +379,7 @@ def post_authenticated_survey(request, question_slug):
             message_body = f'Ciao {subscriber.name},<br><br>'
             message_body += f'grazie per aver partecipato alla nostra indagine.<br><br>'
             message_body += 'Ecco il riepilogo delle tue risposte:<br><br>'
-            message_body += '<br>'.join(summary)
+            message_body += '<br><br>'.join(summary)
 
             # add data to the http session
             request.session['survey_summary'] = summary

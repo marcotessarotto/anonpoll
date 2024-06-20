@@ -239,6 +239,7 @@ class NamedSurveyQuestionOption(models.Model):
 class NamedSurveyResponse(models.Model):
     survey = models.ForeignKey(NamedSurvey, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    subscriber = models.ForeignKey(Subscriber, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"Response on {self.created_at}"

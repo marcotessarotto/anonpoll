@@ -1,8 +1,50 @@
 from django.contrib import admin
+from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from .models import Question, Choice, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, \
     Subscriber, NamedSurveyQuestionOption
 from .models import NamedSurvey, NamedSurveyQuestion, NamedSurveyResponse, NamedSurveyAnswer
+
+
+from openpyxl import Workbook
+
+
+def export_named_survey_answers_to_excel(modeladmin, request, queryset):
+    # Create a workbook and add a worksheet.
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Survey Answers"
+
+    # Define the header
+    columns = ['Survey Title', 'Question', 'Answer', 'Subscriber Email', 'Subscriber Name', 'Subscriber Surname']
+    ws.append(columns)
+
+    # Append data rows
+    for answer in queryset:
+        subscriber = answer.response.subscriber
+        row = [
+            answer.response.survey.title,
+            answer.question.text,
+            answer.text or "No Answer",
+            subscriber.email if subscriber else "No Subscriber",
+            subscriber.name if subscriber else "No Name",
+            subscriber.surname if subscriber else "No Surname"
+        ]
+        ws.append(row)
+
+    # Prepare the HTTP response with the appropriate headers
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="named_survey_answers.xlsx"'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
+export_named_survey_answers_to_excel.short_description = "Export Selected Answers to Excel"
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -125,7 +167,7 @@ class NamedSurveyQuestionAdmin(admin.ModelAdmin):
 
 @admin.register(NamedSurveyResponse)
 class NamedSurveyResponseAdmin(admin.ModelAdmin):
-    list_display = ('survey', 'created_at')
+    list_display = ('survey', 'subscriber', 'created_at')
     list_filter = ('survey', 'created_at')
 
 
@@ -134,3 +176,4 @@ class NamedSurveyAnswerAdmin(admin.ModelAdmin):
     list_display = ('response', 'question', 'text')
     search_fields = ('text', 'question__text')
     list_filter = ('response__survey', 'question')
+    actions = [export_named_survey_answers_to_excel]  #
