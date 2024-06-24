@@ -165,7 +165,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # By default, Django's session cookies are set to expire when the user's browser is closed.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-SESSION_COOKIE_AGE = 1209600  # 2 weeks, in seconds
+SESSION_COOKIE_AGE = 3600*2  # in seconds
 
 # Languages you want to support in your application
 LANGUAGES = [
