@@ -16,7 +16,7 @@ from anonpoll.settings import DEBUG, TECHNICAL_CONTACT_EMAIL, TECHNICAL_CONTACT,
     FROM_EMAIL, DEBUG_EMAIL, EMAIL_HOST
 from anonpoll.view_tools import is_private_ip
 from .forms import VoteForm, SubscriberLoginForm, make_named_survey_form
-from .logic import create_event_log, create_subscriber_if_not_exits
+from .logic import create_event_log, create_subscriber_if_not_exits, create_or_update_subscriber
 from .models import Choice, Question, ChoiceVote, ChoiceSuggestedByUser, ChoiceVoteSuggestedByUser, EventLog, \
     NamedSurvey, NamedSurveyResponse, NamedSurveyQuestion, NamedSurveyAnswer, Subscriber
 
@@ -274,7 +274,7 @@ def subscriber_login(request, question_slug):
                         event_data=f"matricola: {matricola} email: {email} http_real_ip: {http_real_ip}",
                     )
 
-                    subscriber = create_subscriber_if_not_exits(
+                    subscriber, created_or_updated = create_or_update_subscriber(
                         email=subscriber.get('email', ''),
                         name=subscriber.get('name', ''),
                         surname=subscriber.get('surname', ''),
@@ -291,6 +291,13 @@ def subscriber_login(request, question_slug):
 
                     # Reverse the URL with the slug parameter
                     url = reverse('core:post-authenticated-survey', kwargs={'question_slug': question_slug})
+                    print(f"Generated URL: {url}")  # Add this debug line
+
+                    # this has to be solved...
+                    if DEBUG:
+                        url = f'/s/{question_slug}/post-authenticated-survey/'
+                    else:
+                        url = f'/polls/s/{question_slug}/post-authenticated-survey/'
 
                     return redirect(url)
 
@@ -314,7 +321,10 @@ def subscriber_login(request, question_slug):
                 )
 
                 messages.error(request, 'errore: matricola o email non validi')
+            except Exception as e:
+                syslog.syslog(syslog.LOG_ERR, f'Unexpected error: {str(e)}')
 
+                messages.error(request, 'errore interno')
     else:
         form = SubscriberLoginForm()
 

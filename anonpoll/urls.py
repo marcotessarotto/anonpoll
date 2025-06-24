@@ -22,6 +22,7 @@ from anonpoll import settings
 from anonpoll.settings import DEBUG
 
 url_prefix = 'polls/' if not DEBUG else ''
+# url_prefix = ''
 
 urlpatterns = [
     path(url_prefix + 'admin/', admin.site.urls),
