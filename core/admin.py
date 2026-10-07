@@ -49,6 +49,50 @@ def export_named_survey_answers_to_excel(modeladmin, request, queryset):
 export_named_survey_answers_to_excel.short_description = "Export Selected Answers to Excel"
 
 
+def export_named_survey_responses_to_excel(modeladmin, request, queryset):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Survey Responses"
+
+    columns = ['Survey Title', 'Response ID', 'Response Date', 'Question', 'Answer',
+               'Subscriber Email', 'Subscriber Name', 'Subscriber Surname',
+               'Subscriber UAF', 'Subscriber structure']
+    ws.append(columns)
+
+    answers = NamedSurveyAnswer.objects.filter(
+        response__in=queryset
+    ).select_related(
+        'response__survey', 'response__subscriber', 'question'
+    ).order_by('response__pk', 'question__pk')
+
+    for answer in answers:
+        subscriber = answer.response.subscriber
+        row = [
+            answer.response.survey.title,
+            answer.response.pk,
+            answer.response.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            answer.question.text,
+            answer.text or "No Answer",
+            subscriber.email if subscriber else "No Subscriber",
+            subscriber.name if subscriber else "No Name",
+            subscriber.surname if subscriber else "No Surname",
+            subscriber.uaf if subscriber else "No UAF",
+            subscriber.structure if subscriber else "No Structure",
+        ]
+        ws.append(row)
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="named_survey_responses.xlsx"'
+    wb.save(response)
+
+    return response
+
+
+export_named_survey_responses_to_excel.short_description = "Export Selected Responses to Excel"
+
+
 class QuestionAdmin(admin.ModelAdmin):
     # Displaying fields in the list view
     list_display = ('name', 'start_time', 'end_time', 'is_active', 'created_at', 'updated_at')
@@ -171,6 +215,7 @@ class NamedSurveyQuestionAdmin(admin.ModelAdmin):
 class NamedSurveyResponseAdmin(admin.ModelAdmin):
     list_display = ('survey', 'subscriber', 'created_at')
     list_filter = ('survey', 'created_at')
+    actions = [export_named_survey_responses_to_excel]
 
 
 @admin.register(NamedSurveyAnswer)
